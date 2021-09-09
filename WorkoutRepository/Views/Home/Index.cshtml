@@ -1,8 +1,44 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
     ViewData["Title"] = "Home Page";
+    var appName = "Workout Repository";
 }
 
+@if (SignInManager.IsSignedIn(User))
+{
+    bool isAdmin = User.IsInRole("Admin");
+    var user = await UserManager.GetUserAsync(User);
+    var firstName = user.FirstName;
+
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">@appName</h1>
+    <p>Welcome, @firstName!</p>
+    <p><a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">View My Profile [TBD]</a></p>
+
+
+    @if (isAdmin)
+    {
+        <p><a asp-area="" asp-controller="Users" asp-action="Index">View users</a></p>
+
+    }
+    else
+    {
+        <p><a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Go to My Workout [TBD]</a></p>
+
+    }
+
 </div>
+}
+else
+{
+    <div class="text-center">
+        <h1 class="display-4">@appName</h1>
+        <p>Welcome to @appName!</p>
+        <p>This application serves to host a suite of exercise information</p>
+        <p>Like or dislike an exercise? Want to start a discussion?</p>
+        <p><a asp-area="Identity" asp-page="/Account/Register">Sign up now</a> or <a asp-area="Identity" asp-page="/Account/Login">Login</a>!</p>
+    </div>
+}

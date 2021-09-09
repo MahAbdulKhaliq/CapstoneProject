@@ -9,15 +9,18 @@
         var user = await UserManager.GetUserAsync(User);
         var firstName = user.FirstName;
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @firstName!</a>
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">My Account</a>
         </li>
-        
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Profile [TBD]</a>
+        </li>
+
         //Adds headers if the user is an admin (for admin panel options)
         if (isAdmin)
         {
             //Temp admin panel option
             <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
+                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users [PH]</a>
             </li>
         }
 
