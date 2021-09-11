@@ -13,5 +13,6 @@ namespace WorkoutRepository.Data
             : base(options)
         {
         }
+        public DbSet<WorkoutRepository.Models.Exercise> Exercise { get; set; }
     }
 }

@@ -43,7 +43,19 @@ namespace WorkoutRepository
             });
 
             services.AddControllersWithViews();
-            services.AddRazorPages();
+            //Added authorization rule for user to be admin
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequiresAdmin",
+                     policy => policy.RequireRole("Administrator"));
+            });
+            services.AddRazorPages(options =>
+            {
+                //Various razor page authentications
+                options.Conventions.AuthorizePage("/Exercises/Create", "RequiresAdmin");
+                options.Conventions.AuthorizePage("/Exercises/Edit", "RequiresAdmin");
+                options.Conventions.AuthorizePage("/Exercises/Delete", "RequiresAdmin");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

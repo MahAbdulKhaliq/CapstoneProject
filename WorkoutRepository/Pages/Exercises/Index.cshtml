@@ -1,0 +1,79 @@
+﻿@page
+@model WorkoutRepository.Pages.Exercises.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Exercise[0].MuscleGroupId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Exercise[0].PrimaryEquipmentId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Exercise[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Exercise[0].ImageResource)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Exercise[0].EmbedLink)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Exercise[0].Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Exercise[0].PositiveRatings)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Exercise[0].NegativeRatings)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Exercise) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MuscleGroupId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PrimaryEquipmentId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ImageResource)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmbedLink)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PositiveRatings)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NegativeRatings)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
