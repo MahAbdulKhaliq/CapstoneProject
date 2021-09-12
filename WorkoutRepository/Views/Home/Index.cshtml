@@ -11,11 +11,11 @@
 {
     bool isAdmin = User.IsInRole("Admin");
     var user = await UserManager.GetUserAsync(User);
-    var firstName = user.FirstName;
+    var userName = user.WebsiteUserName;
 
 <div class="text-center">
     <h1 class="display-4">@appName</h1>
-    <p>Welcome, @firstName!</p>
+    <p>Welcome, @userName!</p>
     <p><a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">View My Profile [TBD]</a></p>
 
 

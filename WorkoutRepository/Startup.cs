@@ -43,7 +43,9 @@ namespace WorkoutRepository
             });
 
             services.AddControllersWithViews();
-            //Added authorization rule for user to be admin
+            
+            
+            //Added authorization rule for user to be admin for Razor Pages
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("RequiresAdmin",
@@ -51,10 +53,8 @@ namespace WorkoutRepository
             });
             services.AddRazorPages(options =>
             {
-                //Various razor page authentications
-                options.Conventions.AuthorizePage("/Exercises/Create", "RequiresAdmin");
-                options.Conventions.AuthorizePage("/Exercises/Edit", "RequiresAdmin");
-                options.Conventions.AuthorizePage("/Exercises/Delete", "RequiresAdmin");
+                //Various Razor Page authentications can go here
+                
             });
         }
 

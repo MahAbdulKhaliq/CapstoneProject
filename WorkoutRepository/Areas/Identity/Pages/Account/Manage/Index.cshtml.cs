@@ -23,7 +23,7 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        public string Username { get; set; }
+        //public string Username { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -33,6 +33,10 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
+            [Required]
+            [Display(Name = "Username")]
+            public string WebsiteUserName { get; set; }
+
             //TO-DO: Remove phone # references
             [Phone]
             [Display(Name = "Phone number")]
@@ -54,11 +58,13 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             var firstName = user.FirstName;
             var lastName = user.LastName;
+            var websiteUserName = user.WebsiteUserName;
 
-            Username = userName;
+            //Username = userName;
 
             Input = new InputModel
             {
+                WebsiteUserName = websiteUserName,
                 PhoneNumber = phoneNumber,
                 FirstName = firstName,
                 LastName = lastName
@@ -105,6 +111,7 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account.Manage
             // Update custom properties (first name, last name, etc.)
             user.FirstName = Input.FirstName;
             user.LastName = Input.LastName;
+            user.WebsiteUserName = Input.WebsiteUserName;
             await _userManager.UpdateAsync(user);
 
             await _signInManager.RefreshSignInAsync(user);
