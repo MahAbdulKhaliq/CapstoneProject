@@ -1,4 +1,6 @@
 ﻿@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
@@ -10,6 +12,18 @@
     {
         <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
     }
-    <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        bool isAdmin = User.IsInRole("Admin");
+        var user = await UserManager.GetUserAsync(User);
+        var userName = user.WebsiteUserName;
+
+        @if (isAdmin)
+        {
+            <li class="nav-item"><a class="nav-link @ManageNavPages.AdminStatsNavClass(ViewContext)" id="admin-stats" asp-page="./AdminStats">Admin Statistics</a></li>
+
+        }
+    }
+    <!-- <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li> -->
     <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
 </ul>

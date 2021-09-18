@@ -1,0 +1,21 @@
+﻿@page
+@{
+    ViewData["Title"] = "Admin Stats";
+    ViewData["ActivePage"] = ManageNavPages.AdminStats;
+}
+
+<h4>@ViewData["Title"]</h4>
+
+<div class="row">
+    <div class="col-md-6">
+        <p>This page is dedicated towards viewing various admin related functionality.</p>
+        
+        <p>
+            <a asp-area="" asp-controller="Users" asp-action="Index" class="btn btn-primary">Users[PH]</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

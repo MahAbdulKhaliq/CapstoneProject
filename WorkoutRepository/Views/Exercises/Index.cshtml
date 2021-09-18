@@ -1,4 +1,7 @@
 ﻿@model IEnumerable<WorkoutRepository.Models.Exercise>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Index";
@@ -7,9 +10,23 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+
+@if (SignInManager.IsSignedIn(User))
+{
+    bool isAdmin = User.IsInRole("Admin");
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user.WebsiteUserName;
+
+    @if (isAdmin)
+    {
+        <p>
+            <a asp-action="Create" class="btn btn-primary">Create New</a>
+            <a asp-action="Create" class="btn btn-primary">Manage Muscle Groups</a>
+            <a asp-area="" asp-controller="PrimaryEquipments" asp-action="Index" class="btn btn-primary">Manage Primary Equipment</a>
+        </p>
+    }
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -41,38 +58,51 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.MuscleGroupId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PrimaryEquipmentId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageResource)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EmbedLink)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PositiveRatings)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NegativeRatings)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MuscleGroupId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PrimaryEquipmentId)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
+</td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ImageResource)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmbedLink)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PositiveRatings)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NegativeRatings)
+                </td>
+                <td>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        bool isAdmin = User.IsInRole("Admin");
+                        var user = await UserManager.GetUserAsync(User);
+                        var userName = user.WebsiteUserName;
+
+                        @if (isAdmin)
+                        {
+                            <p>
+                                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            </p>
+                        }
+                    }
+                    
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
