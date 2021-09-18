@@ -21,7 +21,7 @@
     {
         <p>
             <a asp-action="Create" class="btn btn-primary">Create New</a>
-            <a asp-action="Create" class="btn btn-primary">Manage Muscle Groups</a>
+            <a asp-area="" asp-controller="MuscleGroups" asp-action="Index" class="btn btn-primary">Manage Muscle Groups</a>
             <a asp-area="" asp-controller="PrimaryEquipments" asp-action="Index" class="btn btn-primary">Manage Primary Equipment</a>
         </p>
     }
@@ -31,10 +31,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.MuscleGroupId)
+                @Html.DisplayNameFor(model => model.MuscleGroup)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PrimaryEquipmentId)
+                @Html.DisplayNameFor(model => model.PrimaryEquipment)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
@@ -62,10 +62,10 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.MuscleGroupId)
+                    @Html.DisplayFor(modelItem => item.MuscleGroup.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.PrimaryEquipmentId)
+                    @Html.DisplayFor(modelItem => item.PrimaryEquipment.Name)
                 </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>

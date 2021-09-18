@@ -23,7 +23,9 @@ namespace WorkoutRepository.Controllers
         // GET: Exercises
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Exercise.ToListAsync());
+            
+            //Updated to retrieve MuscleGroup/PrimaryEquipment objects
+            return View(await _context.Exercise.Include(m => m.MuscleGroup).Include(p => p.PrimaryEquipment).ToListAsync());
         }
 
         // GET: Exercises/Details/5
@@ -48,6 +50,8 @@ namespace WorkoutRepository.Controllers
         // GET: Exercises/Create
         public IActionResult Create()
         {
+            ViewBag.MuscleGroupId = new SelectList(_context.MuscleGroup, "Id", "Name");
+            ViewBag.PrimaryEquipmentId = new SelectList(_context.PrimaryEquipment, "Id", "Name");
             return View();
         }
 
