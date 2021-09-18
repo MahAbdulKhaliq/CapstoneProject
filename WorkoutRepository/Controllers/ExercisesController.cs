@@ -37,6 +37,8 @@ namespace WorkoutRepository.Controllers
             }
 
             var exercise = await _context.Exercise
+                .Include(m => m.MuscleGroup)
+                .Include(p => p.PrimaryEquipment)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (exercise == null)
             {
@@ -76,6 +78,9 @@ namespace WorkoutRepository.Controllers
         // GET: Exercises/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            ViewBag.MuscleGroupId = new SelectList(_context.MuscleGroup, "Id", "Name");
+            ViewBag.PrimaryEquipmentId = new SelectList(_context.PrimaryEquipment, "Id", "Name");
+
             if (id == null)
             {
                 return NotFound();

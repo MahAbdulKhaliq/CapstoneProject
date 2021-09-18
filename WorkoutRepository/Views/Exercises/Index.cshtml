@@ -4,12 +4,21 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Exercises";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Exercises</h1>
 
+@*<form>
+    <p>
+        Exercise Name: <input type="text" asp-for="SearchString" />
+        Muscle Group: <select asp-for="MuscleGroup" asp-items="Model.MuscleGroup">
+            <option value="">All</option>
+        </select>
+        <input type="submit" value="Filter" class="btn btn-primary" />
+    </p>
+</form>*@
 
 @if (SignInManager.IsSignedIn(User))
 {
