@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkoutRepository.Data;
 using WorkoutRepository.Models;
 
@@ -21,11 +21,38 @@ namespace WorkoutRepository.Controllers
         }
 
         // GET: Exercises
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string primaryEquipment, string muscleGroup)
         {
-            
+            ViewBag.CurrentFilter = searchString;
+            ViewBag.MuscleGroup = new SelectList(_context.MuscleGroup, "Id", "Name");
+            ViewBag.PrimaryEquipment = new SelectList(_context.PrimaryEquipment, "Id", "Name");
+
+            var tempQuery = from e in _context.Exercise
+                            join m in _context.MuscleGroup on e.MuscleGroupId equals m.Id
+                            join p in _context.PrimaryEquipment on e.PrimaryEquipmentId equals p.Id
+                            select e;
+            tempQuery = tempQuery.Include(m => m.MuscleGroup).Include(p => p.PrimaryEquipment);
+
+            //Return full list if searchString is empty
+            //Or return a filtered list if searchString is not empty
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                tempQuery = tempQuery.Where(e => e.Name.Contains(searchString));
+            }
+            if (!string.IsNullOrEmpty(primaryEquipment))
+            {
+                int primaryEquipmentId = Int32.Parse(primaryEquipment);
+                tempQuery = tempQuery.Where(e => e.PrimaryEquipmentId.Equals(primaryEquipmentId));
+            }
+            if (!string.IsNullOrEmpty(muscleGroup))
+            {
+                int muscleGroupId = Int32.Parse(muscleGroup);
+                tempQuery = tempQuery.Where(e => e.MuscleGroupId.Equals(muscleGroupId));
+            }
+
+            var query = await tempQuery.ToListAsync();
             //Updated to retrieve MuscleGroup/PrimaryEquipment objects
-            return View(await _context.Exercise.Include(m => m.MuscleGroup).Include(p => p.PrimaryEquipment).ToListAsync());
+            return View(query);
         }
 
         // GET: Exercises/Details/5

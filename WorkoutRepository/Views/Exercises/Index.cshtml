@@ -10,15 +10,19 @@
 
 <h1>Exercises</h1>
 
-@*<form>
+<form asp-action="Index" method="get">
     <p>
-        Exercise Name: <input type="text" asp-for="SearchString" />
-        Muscle Group: <select asp-for="MuscleGroup" asp-items="Model.MuscleGroup">
+        <input type="text" name="searchString" placeholder="Search exercise" value="@ViewBag.CurrentFilter" />
+        Muscle Group: <select name="muscleGroup" asp-items="ViewBag.MuscleGroup">
             <option value="">All</option>
         </select>
-        <input type="submit" value="Filter" class="btn btn-primary" />
+        Primary Equipment: <select name="primaryEquipment" asp-items="ViewBag.PrimaryEquipment">
+            <option value="">All</option>
+        </select>
+        <input type="submit" value="Search" class="btn btn-primary" /> |
+        <a asp-action="Index" class="btn btn-primary">All Exercises</a>
     </p>
-</form>*@
+</form>
 
 @if (SignInManager.IsSignedIn(User))
 {
@@ -40,22 +44,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.MuscleGroup)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PrimaryEquipment)
+                @Html.DisplayNameFor(model => model.ImageResource)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ImageResource)
+                @Html.DisplayNameFor(model => model.MuscleGroup)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EmbedLink)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.PrimaryEquipment)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PositiveRatings)
@@ -69,49 +67,43 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MuscleGroup.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PrimaryEquipment.Name)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
-</td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ImageResource)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmbedLink)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PositiveRatings)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NegativeRatings)
-                </td>
-                <td>
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        bool isAdmin = User.IsInRole("Admin");
-                        var user = await UserManager.GetUserAsync(User);
-                        var userName = user.WebsiteUserName;
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ImageResource)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MuscleGroup.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PrimaryEquipment.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PositiveRatings)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NegativeRatings)
+            </td>
+            <td>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    bool isAdmin = User.IsInRole("Admin");
+                    var user = await UserManager.GetUserAsync(User);
+                    var userName = user.WebsiteUserName;
 
-                        @if (isAdmin)
-                        {
-                            <p>
-                                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                            </p>
-                        }
+                    @if (isAdmin)
+                    {
+                        <p>
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        </p>
                     }
-                    
-                </td>
-            </tr>
+                }
+
+            </td>
+        </tr>
         }
     </tbody>
 </table>
