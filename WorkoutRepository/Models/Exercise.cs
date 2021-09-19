@@ -25,7 +25,7 @@ namespace WorkoutRepository.Models
         public PrimaryEquipment PrimaryEquipment { get; set; }
 
         public string Name { get; set; }
-        [Display(Name = "Image Link")]
+        [Display(Name = "Image")]
         public string ImageResource { get; set; }
         [Display(Name = "Embed Link")]
         public string EmbedLink { get; set; }

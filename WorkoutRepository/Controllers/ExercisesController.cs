@@ -21,7 +21,7 @@ namespace WorkoutRepository.Controllers
         }
 
         // GET: Exercises
-        public async Task<IActionResult> Index(string searchString, string primaryEquipment, string muscleGroup)
+        public async Task<IActionResult> Index(string searchString, string PrimaryEquipmentId, string MuscleGroupId)
         {
             ViewBag.CurrentFilter = searchString;
             ViewBag.MuscleGroup = new SelectList(_context.MuscleGroup, "Id", "Name");
@@ -39,14 +39,14 @@ namespace WorkoutRepository.Controllers
             {
                 tempQuery = tempQuery.Where(e => e.Name.Contains(searchString));
             }
-            if (!string.IsNullOrEmpty(primaryEquipment))
+            if (!string.IsNullOrEmpty(PrimaryEquipmentId))
             {
-                int primaryEquipmentId = Int32.Parse(primaryEquipment);
+                int primaryEquipmentId = Int32.Parse(PrimaryEquipmentId);
                 tempQuery = tempQuery.Where(e => e.PrimaryEquipmentId.Equals(primaryEquipmentId));
             }
-            if (!string.IsNullOrEmpty(muscleGroup))
+            if (!string.IsNullOrEmpty(MuscleGroupId))
             {
-                int muscleGroupId = Int32.Parse(muscleGroup);
+                int muscleGroupId = Int32.Parse(MuscleGroupId);
                 tempQuery = tempQuery.Where(e => e.MuscleGroupId.Equals(muscleGroupId));
             }
 
@@ -167,6 +167,8 @@ namespace WorkoutRepository.Controllers
             }
 
             var exercise = await _context.Exercise
+                .Include(m => m.MuscleGroup)
+                .Include(p => p.PrimaryEquipment)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (exercise == null)
             {

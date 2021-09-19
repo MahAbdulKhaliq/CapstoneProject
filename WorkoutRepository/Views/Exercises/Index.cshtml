@@ -13,10 +13,10 @@
 <form asp-action="Index" method="get">
     <p>
         <input type="text" name="searchString" placeholder="Search exercise" value="@ViewBag.CurrentFilter" />
-        Muscle Group: <select name="muscleGroup" asp-items="ViewBag.MuscleGroup">
+        Muscle Group: <select asp-for="@Model.FirstOrDefault().MuscleGroupId" asp-items="ViewBag.MuscleGroup">
             <option value="">All</option>
         </select>
-        Primary Equipment: <select name="primaryEquipment" asp-items="ViewBag.PrimaryEquipment">
+        Primary Equipment: <select asp-for="@Model.FirstOrDefault().PrimaryEquipmentId" asp-items="ViewBag.PrimaryEquipment">
             <option value="">All</option>
         </select>
         <input type="submit" value="Search" class="btn btn-primary" /> |
@@ -69,7 +69,7 @@
         {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.ImageResource)
+                <img src="~/images/@item.ImageResource" class="card-img-top" style="width: 100px"/>
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
