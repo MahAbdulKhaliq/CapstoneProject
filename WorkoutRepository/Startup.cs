@@ -42,9 +42,11 @@ namespace WorkoutRepository
                 options.User.RequireUniqueEmail = true;
             });
 
-            services.AddControllersWithViews();
-            
-            
+            //services.AddControllersWithViews();
+            //Adding runtime compilation because restarting web app for razor pages is annoying
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
+
             //Added authorization rule for user to be admin for Razor Pages
             services.AddAuthorization(options =>
             {
