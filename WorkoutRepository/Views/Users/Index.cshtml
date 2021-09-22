@@ -4,13 +4,13 @@
     ViewData["Title"] = "Users";
 }
 
-<h1>Index</h1>
+<h1>Users</h1>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.UserName)
+                @Html.DisplayNameFor(model => model.WebsiteUserName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.FirstName)
@@ -24,7 +24,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.UserName)
+                @Html.DisplayFor(modelItem => item.WebsiteUserName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.FirstName)

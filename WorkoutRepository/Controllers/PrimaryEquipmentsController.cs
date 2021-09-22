@@ -148,15 +148,28 @@ namespace WorkoutRepository.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var primaryEquipment = await _context.PrimaryEquipment.FindAsync(id);
-            _context.PrimaryEquipment.Remove(primaryEquipment);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (ExerciseExists(id))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                var primaryEquipment = await _context.PrimaryEquipment.FindAsync(id);
+                _context.PrimaryEquipment.Remove(primaryEquipment);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+               
         }
 
         private bool PrimaryEquipmentExists(int id)
         {
             return _context.PrimaryEquipment.Any(e => e.Id == id);
+        }
+
+        private bool ExerciseExists(int id)
+        {
+            return _context.Exercise.Any(e => e.PrimaryEquipmentId == id);
         }
     }
 }

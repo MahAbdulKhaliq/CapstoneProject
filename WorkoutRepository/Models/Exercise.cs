@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
 
 namespace WorkoutRepository.Models
 {
@@ -24,15 +25,22 @@ namespace WorkoutRepository.Models
         [Display(Name = "Primary Equipment")]
         public PrimaryEquipment PrimaryEquipment { get; set; }
 
+        [Required]
         public string Name { get; set; }
+
         [Display(Name = "Image")]
         public string ImageResource { get; set; }
+        [NotMapped]
+        [Display(Name = "Upload Image")]
+        public IFormFile ImageFile { get; set; }
         [Display(Name = "Embed Link")]
         public string EmbedLink { get; set; }
 
         public string Description { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
         [Display(Name = "Positive Ratings")]
         public int PositiveRatings { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
         [Display(Name = "Negative Ratings")]
         public int NegativeRatings { get; set; }
     }

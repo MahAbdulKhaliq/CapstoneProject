@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace WorkoutRepository.Models
         [PersonalData]
         public string LastName { get; set; }
 
+        [Display(Name = "Username")]
         public string WebsiteUserName { get; set; }
     }
 }

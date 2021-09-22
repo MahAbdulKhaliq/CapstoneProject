@@ -148,15 +148,28 @@ namespace WorkoutRepository.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var muscleGroup = await _context.MuscleGroup.FindAsync(id);
-            _context.MuscleGroup.Remove(muscleGroup);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (ExerciseExists(id))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                var muscleGroup = await _context.MuscleGroup.FindAsync(id);
+                _context.MuscleGroup.Remove(muscleGroup);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            
         }
 
         private bool MuscleGroupExists(int id)
         {
             return _context.MuscleGroup.Any(e => e.Id == id);
+        }
+
+        private bool ExerciseExists(int id)
+        {
+           return _context.Exercise.Any(e => e.MuscleGroupId == id);
         }
     }
 }

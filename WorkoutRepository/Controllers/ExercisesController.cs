@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WorkoutRepository.Data;
@@ -14,10 +16,12 @@ namespace WorkoutRepository.Controllers
     public class ExercisesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public ExercisesController(ApplicationDbContext context)
+        public ExercisesController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            this._hostEnvironment = hostEnvironment;
         }
 
         // GET: Exercises
@@ -90,10 +94,26 @@ namespace WorkoutRepository.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MuscleGroupId,PrimaryEquipmentId,Name,ImageResource,EmbedLink,Description,PositiveRatings,NegativeRatings")] Exercise exercise)
+        public async Task<IActionResult> Create([Bind("Id,MuscleGroupId,PrimaryEquipmentId,Name,ImageFile,EmbedLink,Description,PositiveRatings,NegativeRatings")] Exercise exercise)
         {
             if (ModelState.IsValid)
             {
+                // If the image is uploaded, add the image; otherwise, don't
+                if (exercise.ImageFile != null)
+                {
+                    // Grabbing the uploaded image and save to wwwroot/images
+                    string wwwRootPath = _hostEnvironment.WebRootPath;
+                    string fileName = Path.GetFileNameWithoutExtension(exercise.ImageFile.FileName);
+                    string fileExtension = Path.GetExtension(exercise.ImageFile.FileName);
+                    fileName = fileName + DateTime.Now.ToString("yymmssfff") + fileExtension;
+                    exercise.ImageResource = fileName;
+                    string imagePath = Path.Combine(wwwRootPath + "/images", fileName);
+                    using (var fileStream = new FileStream(imagePath, FileMode.Create))
+                    {
+                        await exercise.ImageFile.CopyToAsync(fileStream);
+                    }
+                }
+                
                 _context.Add(exercise);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -127,7 +147,7 @@ namespace WorkoutRepository.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MuscleGroupId,PrimaryEquipmentId,Name,ImageResource,EmbedLink,Description,PositiveRatings,NegativeRatings")] Exercise exercise)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,MuscleGroupId,PrimaryEquipmentId,Name,ImageResource,ImageFile,EmbedLink,Description,PositiveRatings,NegativeRatings")] Exercise exercise)
         {
             if (id != exercise.Id)
             {
@@ -138,6 +158,41 @@ namespace WorkoutRepository.Controllers
             {
                 try
                 {
+                    // If the image is uploaded, add the image; otherwise, don't
+                    if (exercise.ImageFile != null)
+                    {
+                        
+                        
+                        // Deleting related image file
+                        var oldImagePath = "";
+                        try
+                        {
+                            oldImagePath = Path.Combine(_hostEnvironment.WebRootPath, "images", exercise.ImageResource);
+                        }
+
+
+                        catch (ArgumentNullException) { }
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                        
+                        // Grabbing the uploaded image and save to wwwroot/images
+                        string wwwRootPath = _hostEnvironment.WebRootPath;
+                        string fileName = Path.GetFileNameWithoutExtension(exercise.ImageFile.FileName);
+                        string fileExtension = Path.GetExtension(exercise.ImageFile.FileName);
+                        fileName = fileName + DateTime.Now.ToString("yymmssfff") + fileExtension;
+                        if (fileName != "")
+                        {
+                            exercise.ImageResource = fileName;
+                        }                       
+                        string imagePath = Path.Combine(wwwRootPath + "/images", fileName);
+                        using (var fileStream = new FileStream(imagePath, FileMode.Create))
+                        {
+                            await exercise.ImageFile.CopyToAsync(fileStream);
+                        }
+                    }
+
                     _context.Update(exercise);
                     await _context.SaveChangesAsync();
                 }
@@ -185,6 +240,19 @@ namespace WorkoutRepository.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var exercise = await _context.Exercise.FindAsync(id);
+
+            // Deleting related image file
+            var imagePath = "";
+            try
+            {
+                imagePath = Path.Combine(_hostEnvironment.WebRootPath, "images", exercise.ImageResource);
+            }
+            catch (ArgumentNullException) { }       
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+
             _context.Exercise.Remove(exercise);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
