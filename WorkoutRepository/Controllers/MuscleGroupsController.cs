@@ -63,9 +63,13 @@ namespace WorkoutRepository.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(muscleGroup);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!MuscleGroupNameExists(muscleGroup.Name))
+                {
+                    _context.Add(muscleGroup);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                
             }
             return View(muscleGroup);
         }
@@ -150,7 +154,7 @@ namespace WorkoutRepository.Controllers
         {
             if (ExerciseExists(id))
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Delete));
             }
             else
             {
@@ -162,9 +166,15 @@ namespace WorkoutRepository.Controllers
             
         }
 
+
         private bool MuscleGroupExists(int id)
         {
             return _context.MuscleGroup.Any(e => e.Id == id);
+        }
+
+        private bool MuscleGroupNameExists(string name)
+        {
+            return _context.MuscleGroup.Any(e => e.Name.ToLower() == name.ToLower());
         }
 
         private bool ExerciseExists(int id)

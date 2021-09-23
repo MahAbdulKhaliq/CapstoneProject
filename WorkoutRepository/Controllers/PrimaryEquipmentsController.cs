@@ -63,9 +63,12 @@ namespace WorkoutRepository.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(primaryEquipment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!PrimaryEquipmentNameExists(primaryEquipment.Name))
+                {
+                    _context.Add(primaryEquipment);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }                
             }
             return View(primaryEquipment);
         }
@@ -150,7 +153,7 @@ namespace WorkoutRepository.Controllers
         {
             if (ExerciseExists(id))
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Delete));
             }
             else
             {
@@ -165,6 +168,11 @@ namespace WorkoutRepository.Controllers
         private bool PrimaryEquipmentExists(int id)
         {
             return _context.PrimaryEquipment.Any(e => e.Id == id);
+        }
+
+        private bool PrimaryEquipmentNameExists(string name)
+        {
+            return _context.PrimaryEquipment.Any(e => e.Name.ToLower() == name.ToLower());
         }
 
         private bool ExerciseExists(int id)
