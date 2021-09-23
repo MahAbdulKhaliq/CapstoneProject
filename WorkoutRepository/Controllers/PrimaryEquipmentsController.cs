@@ -50,6 +50,7 @@ namespace WorkoutRepository.Controllers
         // GET: PrimaryEquipments/Create
         public IActionResult Create()
         {
+            ViewBag.ErrorMessage = "";
             return View();
         }
 
@@ -68,6 +69,11 @@ namespace WorkoutRepository.Controllers
                     _context.Add(primaryEquipment);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "A primary equipment with that name already exists.";
+                    return View(primaryEquipment);
                 }                
             }
             return View(primaryEquipment);
@@ -130,6 +136,7 @@ namespace WorkoutRepository.Controllers
         // GET: PrimaryEquipments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+
             if (id == null)
             {
                 return NotFound();
@@ -153,6 +160,7 @@ namespace WorkoutRepository.Controllers
         {
             if (ExerciseExists(id))
             {
+                TempData["ErrorMessage"] = "Exercise(s) with this primary equipment already exists; please modify or delete exercise(s) before deleting this primary equipment type.";
                 return RedirectToAction(nameof(Delete));
             }
             else

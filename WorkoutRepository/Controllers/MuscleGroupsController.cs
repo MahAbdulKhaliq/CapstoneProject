@@ -50,6 +50,7 @@ namespace WorkoutRepository.Controllers
         // GET: MuscleGroups/Create
         public IActionResult Create()
         {
+            ViewBag.ErrorMessage = "";
             return View();
         }
 
@@ -68,6 +69,11 @@ namespace WorkoutRepository.Controllers
                     _context.Add(muscleGroup);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "A muscle group with that name already exists.";
+                    return View(muscleGroup);
                 }
                 
             }
@@ -154,6 +160,7 @@ namespace WorkoutRepository.Controllers
         {
             if (ExerciseExists(id))
             {
+                TempData["ErrorMessage"] = "Exercise(s) with this muscle group already exists; please modify or delete exercise(s) before deleting this muscle group.";
                 return RedirectToAction(nameof(Delete));
             }
             else
