@@ -10,6 +10,8 @@
 
 <h1>Exercises</h1>
 
+
+
 <form asp-action="Index" method="get">
     <p>
         <input type="text" name="searchString" placeholder="Search exercise" value="@ViewBag.CurrentFilter" />
@@ -23,6 +25,10 @@
         <a asp-action="Index" class="btn btn-primary">All Exercises</a>
     </p>
 </form>
+
+@{
+    var userId = UserManager.GetUserId(User);
+}
 
 @if (SignInManager.IsSignedIn(User))
 {
@@ -56,10 +62,7 @@
                 @Html.DisplayNameFor(model => model.PrimaryEquipment)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PositiveRatings)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NegativeRatings)
+                Ratings
             </th>
             <th>
                 Favourite
@@ -85,12 +88,18 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PositiveRatings)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.NegativeRatings)
             </td>
             <td>
-                <button class="btn btn-link far fa-heart"></button>
+                @if (!item.Favourited)
+                {
+                    <button id="button_@item.Id" class="btn btn-link far fa-heart" onclick="Fav(@item.Id, '@userId')"></button>
+                }
+                else
+                {
+                    <button id="button_@item.Id" class="btn btn-link fas fa-heart" onclick="UnFav(@item.Id, '@userId')"></button>
+                }
+
             </td>
             <td>
                 @if (SignInManager.IsSignedIn(User))
@@ -113,3 +122,94 @@
         }
     </tbody>
 </table>
+
+<script type="text/javascript">
+    /**
+     * Adds the exercise to favourites
+     * 
+     * param exerciseId The exercise ID
+     * param userId The user ID
+     */
+    function Fav(exerciseId, userId) {
+
+        let clickedButton = document.getElementById('button_' + exerciseId);
+
+        if (userId == "") {
+            alert("Please log in to favourite exercises.")
+        } else {
+
+            var url = '@Url.Action("_Fav", "Exercises")';
+
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    exerciseId: exerciseId,
+                    userId: userId
+                },
+                success: function (data) {
+                    // No errors
+                    if (data.length == 0) {
+                        clickedButton.classList.replace("far", "fas")
+                        clickedButton.setAttribute("onClick", "UnFav(" + exerciseId + ", '" + userId + "')")
+                    } else {
+                        console.log(data)
+                    }
+                        
+                },
+                error: function (jqXHR) {
+                    // Http status is not 200
+                },
+                complete: function (jqXHR, status) {
+                    // Whether success or error, enters here
+                }
+            });
+        }
+
+
+    };
+
+    /**
+     * Removes the exercise from favourites
+     *
+     * param exerciseId The exercise ID
+     * param userId The user ID
+     */
+    function UnFav(exerciseId, userId) {
+
+        let clickedButton = document.getElementById('button_' + exerciseId);
+
+        if (userId == "") {
+            alert("Please log in to favourite exercises.")
+        } else {
+
+            var url = '@Url.Action("_UnFav", "Exercises")';
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    exerciseId: exerciseId,
+                    userId: userId
+                },
+                success: function (data) {
+                    // No errors
+                    if (data.length == 0) {
+                        clickedButton.classList.replace("fas", "far")
+                        clickedButton.setAttribute("onClick", "Fav(" + exerciseId + ", '" + userId + "')")
+                    } else {
+                    }
+                        
+                },
+                error: function (jqXHR) {
+                    // Http status is not 200
+                },
+                complete: function (jqXHR, status) {
+                    // Whether success or error,  enters here
+                }
+            });
+        }
+    };
+
+</script>

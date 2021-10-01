@@ -43,5 +43,7 @@ namespace WorkoutRepository.Models
         [Range(0, int.MaxValue, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
         [Display(Name = "Negative Ratings")]
         public int NegativeRatings { get; set; }
+        [NotMapped]
+        public bool Favourited { get; set; } = false;
     }
 }

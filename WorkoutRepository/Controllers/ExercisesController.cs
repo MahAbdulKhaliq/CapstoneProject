@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,16 +18,21 @@ namespace WorkoutRepository.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ExercisesController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
+        public ExercisesController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             this._hostEnvironment = hostEnvironment;
+            _userManager = userManager;
         }
 
         // GET: Exercises
         public async Task<IActionResult> Index(string searchString, string PrimaryEquipmentId, string MuscleGroupId)
         {
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            
+
             ViewBag.CurrentFilter = searchString;
             ViewBag.MuscleGroup = new SelectList(_context.MuscleGroup, "Id", "Name");
             ViewBag.PrimaryEquipment = new SelectList(_context.PrimaryEquipment, "Id", "Name");
@@ -36,6 +42,36 @@ namespace WorkoutRepository.Controllers
                             join p in _context.PrimaryEquipment on e.PrimaryEquipmentId equals p.Id
                             select e;
             tempQuery = tempQuery.Include(m => m.MuscleGroup).Include(p => p.PrimaryEquipment);
+
+            
+            try
+            {
+                // Grab the user ID
+                // Still throwing a NullReferenceException when user is logged out
+                string userId = applicationUser.Id;
+                // Query the FavouriteExercises db
+                var favouriteTempQuery = from f in _context.FavouriteExercise
+                                         where f.UserId == userId
+                                         select f;
+
+                // Create two filters of the main query: one that has favourite exercises,
+                // and one that doesn't.
+                var favouritedFilteredQuery = tempQuery.Where(e => favouriteTempQuery.Any(f => f.ExerciseId == e.Id));
+                var unfavouritedFilteredQuery = tempQuery.Where(e => !favouriteTempQuery.Any(f => f.ExerciseId == e.Id));
+
+                // Convert the 'favourited' option from 'false' to 'true' if it is found in the favourited filter query
+                foreach (Exercise e in favouritedFilteredQuery)
+                {
+                    e.Favourited = true;
+                }
+
+                // Combine the queries
+                tempQuery = favouritedFilteredQuery.Concat(unfavouritedFilteredQuery);
+            }catch (NullReferenceException)
+            {
+                
+            }
+            
 
             //Return full list if searchString is empty
             //Or return a filtered list if searchString is not empty
@@ -258,9 +294,56 @@ namespace WorkoutRepository.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        
+
         private bool ExerciseExists(int id)
         {
             return _context.Exercise.Any(e => e.Id == id);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _Fav(int exerciseId, string userId)
+        {
+            // Used to log errors and return as a JSON result
+            List<string> errors = new List<string>(); 
+
+            // DB processing: adds the new favourite exercise to the DB
+            // for this user.
+
+            FavouriteExercise newFavourite = new FavouriteExercise();
+
+            newFavourite.ExerciseId = exerciseId;
+            newFavourite.UserId = userId;
+            newFavourite.DateFavourited = DateTime.Today;
+            _context.FavouriteExercise.Add(newFavourite);
+            await _context.SaveChangesAsync();
+
+            return Json(errors);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _UnFav(int exerciseId, string userId)
+        {
+            // Used to log errors and return as a JSON result
+            List<string> errors = new List<string>();
+
+            // DB processing: removes the favourite exercise to the DB
+            // for this user.
+
+            var favExercise = await _context.FavouriteExercise
+                .Where(m => m.UserId == userId)
+                .FirstOrDefaultAsync(m => m.ExerciseId == exerciseId);
+            try
+            {
+                _context.FavouriteExercise.Remove(favExercise);
+                await _context.SaveChangesAsync();
+            }
+            catch (ArgumentNullException)
+            {
+                errors.Add("Null reference attempt.");
+            }
+            
+            return Json(errors);
         }
     }
 }
