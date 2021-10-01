@@ -90,8 +90,8 @@
             </td>
             <td>
                 @percentRating% <i class="fas fa-thumbs-up"></i><br />
-                <button id="thumbsup_@item.Id" class="btn btn-link far fa-thumbs-up" onclick=""></button>
-                <button id="thumbsdown_@item.Id" class="btn btn-link far fa-thumbs-down" onclick=""></button>
+                <button id="thumbsup_@item.Id" class="btn btn-link far fa-thumbs-up" onclick="Upvote(@item.Id, '@userId')"></button>
+                <button id="thumbsdown_@item.Id" class="btn btn-link far fa-thumbs-down" onclick="Downvote(@item.Id, '@userId')"></button>
             </td>
             <td>
                 @if (!item.Favourited)
@@ -129,7 +129,7 @@
 <script type="text/javascript">
     /**
      * Adds the exercise to favourites
-     * 
+     *
      * param exerciseId The exercise ID
      * param userId The user ID
      */
@@ -155,7 +155,7 @@
                         clickedButton.setAttribute("onClick", "UnFav(" + exerciseId + ", '" + userId + "')")
                     } else {
                         console.log(data)
-                    }                        
+                    }
                 },
                 error: function (jqXHR) {
                     // Http status is not 200
@@ -194,13 +194,97 @@
                         clickedButton.classList.replace("fas", "far")
                         clickedButton.setAttribute("onClick", "Fav(" + exerciseId + ", '" + userId + "')")
                     } else {
-                    }                       
+                    }
                 },
                 error: function (jqXHR) {
                     // Http status is not 200
                 },
                 complete: function (jqXHR, status) {
                     // Whether success or error,  enters here
+                }
+            });
+        }
+    };
+
+    /**
+     * Adds a rating to the object
+     *
+     * param exerciseId The exercise ID
+     */
+    function Upvote(exerciseId, userId) {
+
+        let clickedButton = document.getElementById('thumbsup_' + exerciseId);
+        let relatedButton = document.getElementById('thumbsdown_' + exerciseId);
+
+        if (userId == "") {
+            alert("Please log in to favourite exercises.")
+        } else {
+            var url = '@Url.Action("_Upvote", "Exercises")';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    exerciseId: exerciseId
+                },
+                success: function (data) {
+                    // No errors
+                    if (data.length == 0) {
+                        alert("Upvoted")
+                        clickedButton.classList.replace("far", "fas")
+                        clickedButton.setAttribute("onClick", "")
+                        relatedButton.setAttribute("onClick", "")
+                        relatedButton.disabled = true;
+                    } else {
+                        console.log(data)
+                    }
+                },
+                error: function (jqXHR) {
+                    // Http status is not 200
+                },
+                complete: function (jqXHR, status) {
+                    // Whether success or error, enters here
+                }
+            });
+        }
+    };
+
+    /**
+     * Adds a rating to the object
+     *
+     * param exerciseId The exercise ID
+     */
+    function Downvote(exerciseId, userId) {
+
+        let clickedButton = document.getElementById('thumbsdown_' + exerciseId);
+        let relatedButton = document.getElementById('thumbsup_' + exerciseId);
+
+        if (userId == "") {
+            alert("Please log in to favourite exercises.")
+        } else {
+            var url = '@Url.Action("_Downvote", "Exercises")';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    exerciseId: exerciseId
+                },
+                success: function (data) {
+                    // No errors
+                    if (data.length == 0) {
+                        alert("Downvoted")
+                        clickedButton.classList.replace("far", "fas")
+                        clickedButton.setAttribute("onClick", "")
+                        relatedButton.setAttribute("onClick", "")
+                        relatedButton.disabled = true;
+                    } else {
+                        console.log(data)
+                    }
+                },
+                error: function (jqXHR) {
+                    // Http status is not 200
+                },
+                complete: function (jqXHR, status) {
+                    // Whether success or error, enters here
                 }
             });
         }

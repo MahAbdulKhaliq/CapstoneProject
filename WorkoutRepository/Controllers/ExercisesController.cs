@@ -345,5 +345,43 @@ namespace WorkoutRepository.Controllers
             
             return Json(errors);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> _Upvote(int exerciseId, string userId)
+        {
+            // Used to log errors and return as a JSON result
+            List<string> errors = new List<string>();
+
+            // DB processing: upvotes the object
+            var exercise = await _context.Exercise
+                .FirstOrDefaultAsync(m => m.Id == exerciseId);
+
+            exercise.PositiveRatings++;
+            _context.Update(exercise);
+            await _context.SaveChangesAsync();
+
+
+
+            return Json(errors);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _Downvote(int exerciseId, string userId)
+        {
+            // Used to log errors and return as a JSON result
+            List<string> errors = new List<string>();
+
+            // DB processing: downvotes
+            var exercise = await _context.Exercise
+                .FirstOrDefaultAsync(m => m.Id == exerciseId);
+
+            exercise.NegativeRatings++;
+            _context.Update(exercise);
+            await _context.SaveChangesAsync();
+
+            return Json(errors);
+        }
+
+
     }
 }
