@@ -73,6 +73,8 @@
     <tbody>
         @foreach (var item in Model)
         {
+            double percentRating = Convert.ToDouble(item.PositiveRatings) / Convert.ToDouble(item.PositiveRatings + item.NegativeRatings) * 100;
+            percentRating = Math.Round(percentRating, 2);
         <tr>
             <td>
                 <img src="~/images/@item.ImageResource" class="card-img-top" style="width: 100px" />
@@ -87,17 +89,18 @@
                 @Html.DisplayFor(modelItem => item.PrimaryEquipment.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.PositiveRatings)
-                @Html.DisplayFor(modelItem => item.NegativeRatings)
+                @percentRating% <i class="fas fa-thumbs-up"></i><br />
+                <button id="thumbsup_@item.Id" class="btn btn-link far fa-thumbs-up" onclick=""></button>
+                <button id="thumbsdown_@item.Id" class="btn btn-link far fa-thumbs-down" onclick=""></button>
             </td>
             <td>
                 @if (!item.Favourited)
                 {
-                    <button id="button_@item.Id" class="btn btn-link far fa-heart" onclick="Fav(@item.Id, '@userId')"></button>
+                    <button id="favbutton_@item.Id" class="btn btn-link far fa-heart" onclick="Fav(@item.Id, '@userId')"></button>
                 }
                 else
                 {
-                    <button id="button_@item.Id" class="btn btn-link fas fa-heart" onclick="UnFav(@item.Id, '@userId')"></button>
+                    <button id="favbutton_@item.Id" class="btn btn-link fas fa-heart" onclick="UnFav(@item.Id, '@userId')"></button>
                 }
 
             </td>
@@ -132,15 +135,12 @@
      */
     function Fav(exerciseId, userId) {
 
-        let clickedButton = document.getElementById('button_' + exerciseId);
+        let clickedButton = document.getElementById('favbutton_' + exerciseId);
 
         if (userId == "") {
             alert("Please log in to favourite exercises.")
         } else {
-
             var url = '@Url.Action("_Fav", "Exercises")';
-
-
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -155,8 +155,7 @@
                         clickedButton.setAttribute("onClick", "UnFav(" + exerciseId + ", '" + userId + "')")
                     } else {
                         console.log(data)
-                    }
-                        
+                    }                        
                 },
                 error: function (jqXHR) {
                     // Http status is not 200
@@ -166,8 +165,6 @@
                 }
             });
         }
-
-
     };
 
     /**
@@ -178,14 +175,12 @@
      */
     function UnFav(exerciseId, userId) {
 
-        let clickedButton = document.getElementById('button_' + exerciseId);
+        let clickedButton = document.getElementById('favbutton_' + exerciseId);
 
         if (userId == "") {
             alert("Please log in to favourite exercises.")
         } else {
-
             var url = '@Url.Action("_UnFav", "Exercises")';
-
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -199,8 +194,7 @@
                         clickedButton.classList.replace("fas", "far")
                         clickedButton.setAttribute("onClick", "Fav(" + exerciseId + ", '" + userId + "')")
                     } else {
-                    }
-                        
+                    }                       
                 },
                 error: function (jqXHR) {
                     // Http status is not 200
