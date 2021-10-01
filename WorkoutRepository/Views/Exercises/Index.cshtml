@@ -74,6 +74,10 @@
         @foreach (var item in Model)
         {
             double percentRating = Convert.ToDouble(item.PositiveRatings) / Convert.ToDouble(item.PositiveRatings + item.NegativeRatings) * 100;
+            if (Double.IsNaN(percentRating))
+            {
+                percentRating = 0;
+            }
             percentRating = Math.Round(percentRating, 2);
         <tr>
             <td>
@@ -217,7 +221,7 @@
         let relatedButton = document.getElementById('thumbsdown_' + exerciseId);
 
         if (userId == "") {
-            alert("Please log in to favourite exercises.")
+            alert("Please log in to vote on exercises.")
         } else {
             var url = '@Url.Action("_Upvote", "Exercises")';
             $.ajax({
@@ -229,7 +233,6 @@
                 success: function (data) {
                     // No errors
                     if (data.length == 0) {
-                        alert("Upvoted")
                         clickedButton.classList.replace("far", "fas")
                         clickedButton.setAttribute("onClick", "")
                         relatedButton.setAttribute("onClick", "")
@@ -259,7 +262,7 @@
         let relatedButton = document.getElementById('thumbsup_' + exerciseId);
 
         if (userId == "") {
-            alert("Please log in to favourite exercises.")
+            alert("Please log in to vote on exercises.")
         } else {
             var url = '@Url.Action("_Downvote", "Exercises")';
             $.ajax({
@@ -271,7 +274,6 @@
                 success: function (data) {
                     // No errors
                     if (data.length == 0) {
-                        alert("Downvoted")
                         clickedButton.classList.replace("far", "fas")
                         clickedButton.setAttribute("onClick", "")
                         relatedButton.setAttribute("onClick", "")
