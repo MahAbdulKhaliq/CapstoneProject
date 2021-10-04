@@ -16,7 +16,7 @@ namespace WorkoutRepository.Data
         public DbSet<WorkoutRepository.Models.Exercise> Exercise { get; set; }
         public DbSet<WorkoutRepository.Models.PrimaryEquipment> PrimaryEquipment { get; set; }
         public DbSet<WorkoutRepository.Models.MuscleGroup> MuscleGroup { get; set; }
-
         public DbSet<WorkoutRepository.Models.FavouriteExercise> FavouriteExercise { get; set; }
+        public DbSet<WorkoutRepository.Models.Comment> Comment { get; set; }
     }
 }

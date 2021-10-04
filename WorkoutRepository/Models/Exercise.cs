@@ -39,11 +39,13 @@ namespace WorkoutRepository.Models
         public string Description { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
         [Display(Name = "Positive Ratings")]
-        public int PositiveRatings { get; set; }
+        public int PositiveRatings { get; set; } = 0;
         [Range(0, int.MaxValue, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
         [Display(Name = "Negative Ratings")]
-        public int NegativeRatings { get; set; }
+        public int NegativeRatings { get; set; } = 0;
         [NotMapped]
         public bool Favourited { get; set; } = false;
+
+        public Comment Comment { get; set; }
     }
 }
