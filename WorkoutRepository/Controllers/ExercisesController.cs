@@ -383,20 +383,17 @@ namespace WorkoutRepository.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> _PostComment(int exerciseId, string userId)
+        public async Task<IActionResult> _PostComment([Bind("Id, Author, ExerciseId, Content, Date")] Comment comment)
         {
-            // Used to log errors and return as a JSON result
-            List<string> errors = new List<string>();
 
-            // DB processing: downvotes
-            var exercise = await _context.Exercise
-                .FirstOrDefaultAsync(m => m.Id == exerciseId);
+            // DB processing: adding comments
 
-            exercise.NegativeRatings++;
-            _context.Update(exercise);
+            comment.Date = DateTime.Today;
+            _context.Comment.Add(comment);
             await _context.SaveChangesAsync();
 
-            return Json(errors);
+
+            return RedirectToAction("Details", new { id = comment.ExerciseId });
         }
 
 

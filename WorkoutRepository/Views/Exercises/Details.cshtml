@@ -6,6 +6,10 @@
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    bool isAdmin = User.IsInRole("Admin");
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user.WebsiteUserName;
 }
 
 <h1 class="text-center">@Html.DisplayFor(model => model.Name)</h1>
@@ -15,9 +19,7 @@
     <div>
         @if (SignInManager.IsSignedIn(User))
         {
-            bool isAdmin = User.IsInRole("Admin");
-            var user = await UserManager.GetUserAsync(User);
-            var userName = user.WebsiteUserName;
+            
 
             @if (isAdmin)
             {
@@ -87,7 +89,8 @@
 {
     <div>
         <form asp-action="_postComment">
-            <input readonly hidden/>
+            <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
+            <input asp-for="Comment.Author" value="@userName" readonly hidden />
             <div class="form-group">
                 <label for="comment">Comment</label>
                 <textarea asp-for="Comment.Content" class="form-control" rows="3" required></textarea>
