@@ -123,10 +123,10 @@ namespace WorkoutRepository.Controllers
             // Then, grab comments for that exercise
             var comments = from c in _context.Comment
                            select c;
-            
+
             comments = comments.Where(c => c.ExerciseId == id)
-                                .OrderByDescending(c => c.Date)
-                                .OrderBy(c => c.Deleted);
+                                .OrderBy(c => c.Deleted)
+                                .ThenByDescending(c => c.Date);
 
 
             try
