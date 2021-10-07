@@ -92,6 +92,9 @@ namespace WorkoutRepository.Controllers
             }
 
             var query = await tempQuery.ToListAsync();
+
+            // Order by favourited exercise
+            query = query.OrderByDescending(e => e.Favourited).ToList();
             //Updated to retrieve MuscleGroup/PrimaryEquipment objects
             return View(query);
         }
@@ -122,7 +125,8 @@ namespace WorkoutRepository.Controllers
                            select c;
             
             comments = comments.Where(c => c.ExerciseId == id)
-                                .OrderByDescending(c => c.Date);
+                                .OrderByDescending(c => c.Date)
+                                .OrderBy(c => c.Deleted);
 
 
             try

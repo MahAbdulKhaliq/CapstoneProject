@@ -9,7 +9,14 @@
 
     bool isAdmin = User.IsInRole("Admin");
     var user = await UserManager.GetUserAsync(User);
-    
+
+    double percentRating = Convert.ToDouble(Model.PositiveRatings) / Convert.ToDouble(Model.PositiveRatings + Model.NegativeRatings) * 100;
+    if (Double.IsNaN(percentRating))
+    {
+        percentRating = 0;
+    }
+    percentRating = Math.Round(percentRating, 2);
+
 }
 
 <h1 class="text-center">@Html.DisplayFor(model => model.Name)</h1>
@@ -71,19 +78,15 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PositiveRatings)
+            Ratings
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PositiveRatings)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NegativeRatings)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NegativeRatings)
+            @percentRating% (@Html.DisplayFor(model => model.PositiveRatings) positive,@Html.DisplayFor(model => model.NegativeRatings) negative)
         </dd>
     </dl>
 </div>
+
+<h3 class="mt-5">@Model.Comments.Where(c => !c.Deleted).Count() Comment(s)</h3>
 
 @if (SignInManager.IsSignedIn(User))
 {
@@ -95,7 +98,7 @@
             <div class="form-group">
                 <label for="comment">Comment</label>
                 <textarea asp-for="Comment.Content" class="form-control" rows="3" required></textarea>
-                <button type="submit" class="btn btn-primary">Post Comment</button>
+                <button type="submit" class="btn btn-primary mt-2">Post Comment</button>
             </div>
         </form>
     </div>
@@ -103,7 +106,7 @@
 else
 {
     <div>
-        Login to comment on this post
+        <a asp-area="Identity" asp-page="/Account/Register">Sign up now</a> or <a asp-area="Identity" asp-page="/Account/Login">Login</a> to comment on this post.
     </div>
 }
 
@@ -111,31 +114,32 @@ else
 {
     @if (!comment.Deleted)
     {
-        <div class="border border-primary mb-4">
-            Author: @comment.Author <br />
-            Date: @comment.Date
-            @if (comment.Edited)
-            {
-                <span>*(edited on @comment.DateEdited)</span><br />
-            }
-            else
-            {
-                <br />
-            }
-            Content: @comment.Content <br />
+        <div class="shadow p-3 mb-5 bg-body rounded">
+            
+            <blockquote class="blockquote">
+                <p class="mb-0">@comment.Content</p>
+                <footer class="blockquote-footer">@comment.Author - <cite>
+                @comment.Date
+                @if (comment.Edited)
+                {
+                    <span>*(edited on @comment.DateEdited)</span>
+                }
+                </cite>
+                </footer>
+            </blockquote>
+            
 
 
 
             @if (comment.Editable)
             {
-                <button id="editButton_@comment.Id" class="btn btn-primary" onclick="ShowEditForm(@comment.Id)">Edit</button>
+                <button id="editButton_@comment.Id" class="btn btn-primary mt-1" onclick="ShowEditForm(@comment.Id)">Edit</button>
                 <form id="editForm_@comment.Id" asp-action="_editComment" style="display: none;">
                     <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
                     <input asp-for="Comment.Id" value="@comment.Id" readonly hidden />
                     <div class="form-group">
-                        <label for="comment">Comment</label>
                         <textarea asp-for="Comment.Content" class="form-control" rows="3" required></textarea>
-                        <button type="submit" class="btn btn-primary">Edit Comment</button>
+                        <button type="submit" class="btn btn-primary mt-1">Edit Comment</button>
                     </div>
                 </form>
 
@@ -146,23 +150,34 @@ else
                     <input asp-for="Comment.Id" value="@comment.Id" readonly hidden />
                     <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
                     <div class="form-group">
-                        <button type="submit" class="btn btn-danger">Delete Comment</button>
+                        <button type="submit" class="btn btn-danger mt-1">Delete Comment</button>
                     </div>
                 </form>
             }
         </div>
     }else
         {
-            <div class="border border-primary mb-4">
-                Author: [deleted] <br />
-                Date: @comment.Date <br />
-                Content: [deleted] <br />
+            <div class="shadow p-3 mb-5 bg-body rounded">
+                <blockquote class="blockquote">
+                    <p class="mb-0">[deleted]</p>
+                    <footer class="blockquote-footer">
+                        [deleted] - <cite>
+                                            @comment.Date
+                                            @if (comment.Edited)
+                                            {
+                                                <span>*(edited on @comment.DateEdited)</span>
+                                            }
+                                        </cite>
+                                    </footer>
+                </blockquote>
             </div>
         }
     }
 
 
 <script type="text/javascript">
+
+
     function ShowEditForm(commentId) {
         let editForm = document.getElementById('editForm_' + commentId);
         let relatedButton = document.getElementById('editButton_' + commentId);
