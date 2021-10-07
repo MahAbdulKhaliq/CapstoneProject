@@ -14,6 +14,7 @@ using WorkoutRepository.Models;
 
 namespace WorkoutRepository.Controllers
 {
+
     public class ExercisesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -98,11 +99,15 @@ namespace WorkoutRepository.Controllers
         // GET: Exercises/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            
+
             if (id == null)
             {
                 return NotFound();
             }
 
+            // First, grab exercise details
             var exercise = await _context.Exercise
                 .Include(m => m.MuscleGroup)
                 .Include(p => p.PrimaryEquipment)
@@ -111,6 +116,44 @@ namespace WorkoutRepository.Controllers
             {
                 return NotFound();
             }
+
+            // Then, grab comments for that exercise
+            var comments = from c in _context.Comment
+                           select c;
+            
+            comments = comments.Where(c => c.ExerciseId == id)
+                                .OrderByDescending(c => c.Date);
+
+
+            try
+            {
+                // Grabs the User ID
+                string userId = applicationUser.Id;
+
+
+                // Checks to see if the comment belongs to the user,
+                // or if the user is an admin. Admins can delete any comment.
+                // Users can edit and delete their own comments.
+                foreach (Comment comment in comments)
+                {
+                    if (comment.AuthorId == userId)
+                    {
+                        comment.Editable = true;
+                        comment.Deletable = true;
+                    }
+                    if (User.IsInRole("Admin"))
+                    {
+                        comment.Deletable = true;
+                    }
+                }
+            }catch(NullReferenceException e)
+            {
+
+            }
+            
+            // Finally, place that exercise's comments in the Comments IQueryable object
+            // of the Exercise model.
+            exercise.Comments = comments;
 
             return View(exercise);
         }
@@ -383,13 +426,58 @@ namespace WorkoutRepository.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> _PostComment([Bind("Id, Author, ExerciseId, Content, Date")] Comment comment)
+        public async Task<IActionResult> _PostComment([Bind("Id, Author, AuthorId, ExerciseId, Content, Date, Editable, Edited, DateEdited, Deletable, Deleted")] Comment comment)
         {
+
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            string userId = applicationUser.Id;
 
             // DB processing: adding comments
 
-            comment.Date = DateTime.Today;
+            comment.AuthorId = userId;
+
+            comment.Date = DateTime.Now;
             _context.Comment.Add(comment);
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction("Details", new { id = comment.ExerciseId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _EditComment([Bind("Id, Author, AuthorId, ExerciseId, Content, Date, Editable, Edited, DateEdited, Deletable, Deleted")] Comment comment, string editedText)
+        {
+
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            string userId = applicationUser.Id;
+
+            // DB processing: editing comments
+
+            var commentToBeEdited = await _context.Comment
+                .FirstOrDefaultAsync(m => m.Id == comment.Id);
+
+            commentToBeEdited.Content = comment.Content + "*";
+            commentToBeEdited.Edited = true;
+            commentToBeEdited.DateEdited = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction("Details", new { id = comment.ExerciseId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _DeleteComment([Bind("Id, Author, AuthorId, ExerciseId, Content, Date, Editable, Edited, DateEdited, Deletable, Deleted")] Comment comment)
+        {
+
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            string userId = applicationUser.Id;
+
+            // DB processing: 'deleting' comments
+
+            var commentToBeDeleted = await _context.Comment
+                .FirstOrDefaultAsync(m => m.Id == comment.Id);
+
+            commentToBeDeleted.Deleted = true;
             await _context.SaveChangesAsync();
 
 

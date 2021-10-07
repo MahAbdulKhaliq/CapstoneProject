@@ -10,7 +10,7 @@ namespace WorkoutRepository.Models
     {
         [Key]
         public int Id { get; set; }
-
+        // Name of primary equipment
         public string Name { get; set; }
     }
 }

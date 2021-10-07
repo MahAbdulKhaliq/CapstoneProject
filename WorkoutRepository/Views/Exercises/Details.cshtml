@@ -9,7 +9,7 @@
 
     bool isAdmin = User.IsInRole("Admin");
     var user = await UserManager.GetUserAsync(User);
-    var userName = user.WebsiteUserName;
+    
 }
 
 <h1 class="text-center">@Html.DisplayFor(model => model.Name)</h1>
@@ -19,7 +19,7 @@
     <div>
         @if (SignInManager.IsSignedIn(User))
         {
-            
+
 
             @if (isAdmin)
             {
@@ -87,6 +87,7 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
+    var userName = user.WebsiteUserName;
     <div>
         <form asp-action="_postComment">
             <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
@@ -101,8 +102,83 @@
 }
 else
 {
-<div>
-    Login to comment on this post
-</div>
+    <div>
+        Login to comment on this post
+    </div>
 }
+
+@foreach (var comment in Model.Comments)
+{
+    @if (!comment.Deleted)
+    {
+        <div class="border border-primary mb-4">
+            Author: @comment.Author <br />
+            Date: @comment.Date
+            @if (comment.Edited)
+            {
+                <span>*(edited on @comment.DateEdited)</span><br />
+            }
+            else
+            {
+                <br />
+            }
+            Content: @comment.Content <br />
+
+
+
+            @if (comment.Editable)
+            {
+                <button id="editButton_@comment.Id" class="btn btn-primary" onclick="ShowEditForm(@comment.Id)">Edit</button>
+                <form id="editForm_@comment.Id" asp-action="_editComment" style="display: none;">
+                    <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
+                    <input asp-for="Comment.Id" value="@comment.Id" readonly hidden />
+                    <div class="form-group">
+                        <label for="comment">Comment</label>
+                        <textarea asp-for="Comment.Content" class="form-control" rows="3" required></textarea>
+                        <button type="submit" class="btn btn-primary">Edit Comment</button>
+                    </div>
+                </form>
+
+            }
+            @if (comment.Deletable)
+            {
+                <form asp-action="_DeleteComment">
+                    <input asp-for="Comment.Id" value="@comment.Id" readonly hidden />
+                    <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-danger">Delete Comment</button>
+                    </div>
+                </form>
+            }
+        </div>
+    }else
+        {
+            <div class="border border-primary mb-4">
+                Author: [deleted] <br />
+                Date: @comment.Date <br />
+                Content: [deleted] <br />
+            </div>
+        }
+    }
+
+
+<script type="text/javascript">
+    function ShowEditForm(commentId) {
+        let editForm = document.getElementById('editForm_' + commentId);
+        let relatedButton = document.getElementById('editButton_' + commentId);
+
+        editForm.style.display = "block";
+        relatedButton.innerHTML = "Hide Edit Prompt";
+        relatedButton.setAttribute("onClick", "HideEditForm(" + commentId + ")");
+    }
+
+    function HideEditForm(commentId) {
+        let editForm = document.getElementById('editForm_' + commentId);
+        let relatedButton = document.getElementById('editButton_' + commentId);
+
+        editForm.style.display = "none";
+        relatedButton.innerHTML = "Edit";
+        relatedButton.setAttribute("onClick", "ShowEditForm(" + commentId + ")");
+    }
+</script>
 
