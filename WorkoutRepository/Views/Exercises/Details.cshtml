@@ -66,12 +66,6 @@
             <a asp-area="" asp-controller="Exercises" asp-action="Index">@Html.DisplayFor(model => model.PrimaryEquipment.Name)</a>
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EmbedLink)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.EmbedLink)
-        </dd>
-        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
         <dd class="col-sm-10">
@@ -81,7 +75,7 @@
             Ratings
         </dt>
         <dd class="col-sm-10">
-            @percentRating% (@Html.DisplayFor(model => model.PositiveRatings) positive,@Html.DisplayFor(model => model.NegativeRatings) negative)
+            @percentRating% (@Html.DisplayFor(model => model.PositiveRatings) positive, @Html.DisplayFor(model => model.NegativeRatings) negative)
         </dd>
     </dl>
 </div>
