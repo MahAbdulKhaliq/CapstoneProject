@@ -7,6 +7,7 @@ namespace WorkoutRepository.Models
 {
     public class Reply : Comment
     {
-        public int CommentId { get; set; }
+        public int ParentCommentId { get; set; }
+
     }
 }

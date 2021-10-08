@@ -17,6 +17,8 @@
     }
     percentRating = Math.Round(percentRating, 2);
 
+    int totalComments = @Model.Comments.Where(c => !c.Deleted).Count() + @Model.Replies.Where(c => !c.Deleted).Count();
+
 }
 
 <h1 class="text-center">@Html.DisplayFor(model => model.Name)</h1>
@@ -31,7 +33,7 @@
             @if (isAdmin)
             {
                 <p>
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
                 </p>
             }
         }
@@ -80,7 +82,7 @@
     </dl>
 </div>
 
-<h3 class="mt-5">@Model.Comments.Where(c => !c.Deleted).Count() Comment(s)</h3>
+<h3 class="mt-5">@totalComments Comment(s)</h3>
 
 @if (SignInManager.IsSignedIn(User))
 {
@@ -108,65 +110,148 @@ else
 {
     @if (!comment.Deleted)
     {
-        <div class="shadow p-3 mb-5 bg-body rounded">
-            
+        <div class="shadow p-3 mt-5 bg-body rounded">
+
             <blockquote class="blockquote">
                 <p class="mb-0">@comment.Content</p>
-                <footer class="blockquote-footer">@comment.Author - <cite>
-                @comment.Date
-                @if (comment.Edited)
-                {
-                    <span>*(edited on @comment.DateEdited)</span>
-                }
+                <footer class="blockquote-footer">
+                    @comment.Author - <cite>
+                    @comment.Date
+                    @if (comment.Edited)
+                    {
+                        <span>*(edited on @comment.DateEdited)</span>
+                    }
                 </cite>
-                </footer>
-            </blockquote>
-            
+            </footer>
+        </blockquote>
 
-
-
-            @if (comment.Editable)
-            {
-                <button id="editButton_@comment.Id" class="btn btn-primary mt-1" onclick="ShowEditForm(@comment.Id)">Edit</button>
-                <form id="editForm_@comment.Id" asp-action="_editComment" style="display: none;">
-                    <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
-                    <input asp-for="Comment.Id" value="@comment.Id" readonly hidden />
-                    <div class="form-group">
-                        <textarea asp-for="Comment.Content" class="form-control" rows="3" required></textarea>
-                        <button type="submit" class="btn btn-primary mt-1">Edit Comment</button>
-                    </div>
-                </form>
-
-            }
-            @if (comment.Deletable)
-            {
-                <form asp-action="_DeleteComment">
-                    <input asp-for="Comment.Id" value="@comment.Id" readonly hidden />
-                    <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-danger mt-1">Delete Comment</button>
-                    </div>
-                </form>
-            }
-        </div>
-    }else
+        @if (comment.Editable)
         {
-            <div class="shadow p-3 mb-5 bg-body rounded">
-                <blockquote class="blockquote">
-                    <p class="mb-0">[deleted]</p>
-                    <footer class="blockquote-footer">
-                        [deleted] - <cite>
-                                            @comment.Date
-                                            @if (comment.Edited)
-                                            {
-                                                <span>*(edited on @comment.DateEdited)</span>
-                                            }
-                                        </cite>
-                                    </footer>
+            <button id="editButton_@comment.Id" class="btn btn-primary mb-1" onclick="ShowEditForm(@comment.Id)">Edit</button>
+            <form id="editForm_@comment.Id" asp-action="_editComment" style="display: none;">
+                <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
+                <input asp-for="Comment.Id" value="@comment.Id" readonly hidden />
+                <div class="form-group">
+                    <textarea asp-for="Comment.Content" class="form-control" rows="3" required></textarea>
+                    <button type="submit" class="btn btn-primary mt-1">Edit Comment</button>
+                </div>
+            </form>
+        }
+
+        
+
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <button id="replyButton_@comment.Id" class="btn btn-info mb-1" onclick="ShowReplyForm(@comment.Id)">Reply</button>
+            var userName = user.WebsiteUserName;
+            <form id="replyForm_@comment.Id" asp-action="_postReply" style="display: none;">
+                <input asp-for="Reply.ExerciseId" value="@Model.Id" readonly hidden />
+                <input asp-for="Reply.Author" value="@userName" readonly hidden />
+                <input asp-for="Reply.ParentCommentId" value="@comment.Id" readonly hidden />
+                <div class="form-group">
+                    <textarea asp-for="Reply.Content" class="form-control" rows="3" required></textarea>
+                    <button type="submit" class="btn btn-primary mt-2">Post Reply</button>
+                </div>
+            </form>
+        }
+
+        @if (comment.Deletable)
+        {
+            <form asp-action="_DeleteComment">
+                <input asp-for="Comment.Id" value="@comment.Id" readonly hidden />
+                <input asp-for="Comment.ExerciseId" value="@Model.Id" readonly hidden />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger mt-1">Delete Comment</button>
+                </div>
+            </form>
+        }
+    </div>
+}
+else
+{
+    <div class="shadow p-3 mt-5 bg-body rounded">
+        <blockquote class="blockquote">
+            <p class="mb-0">[deleted]</p>
+            <footer class="blockquote-footer">
+                [deleted] - <cite>
+                    @comment.Date
+                    @if (comment.Edited)
+                    {
+                        <span>*(edited on @comment.DateEdited)</span>
+                    }
+                </cite>
+            </footer>
+        </blockquote>
+    </div>
+}
+
+    foreach (var reply in Model.Replies)
+    {
+        if (reply.ParentCommentId == comment.Id)
+        {
+            @if (!reply.Deleted)
+            {
+                <div class="shadow p-3 mt-3 ml-auto bg-body rounded col-10">
+
+                    <blockquote class="blockquote">
+                        <p class="mb-0">@reply.Content</p>
+                        <footer class="blockquote-footer">
+                            @reply.Author - <cite>
+                            @reply.Date
+                            @if (reply.Edited)
+                            {
+                                <span>*(edited on @reply.DateEdited)</span>
+                            }
+                        </cite>
+                    </footer>
                 </blockquote>
+
+                @if (reply.Editable)
+                {
+                    <button id="editButton_@reply.Id" class="btn btn-primary mb-1" onclick="ShowEditForm(@reply.Id)">Edit</button>
+                    <form id="editForm_@reply.Id" asp-action="_editReply" style="display: none;">
+                        <input asp-for="Reply.ExerciseId" value="@Model.Id" readonly hidden />
+                        <input asp-for="Reply.Id" value="@reply.Id" readonly hidden />
+                        <div class="form-group">
+                            <textarea asp-for="@reply.Content" class="form-control" rows="3" required></textarea>
+                            <button type="submit" class="btn btn-primary mt-1">Edit Reply</button>
+                        </div>
+                    </form>
+                }
+
+                @if (reply.Deletable)
+                {
+                    <form asp-action="_DeleteReply">
+                        <input asp-for="Reply.Id" value="@reply.Id" readonly hidden />
+                        <input asp-for="Reply.ExerciseId" value="@Model.Id" readonly hidden />
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-danger mt-1">Delete Reply</button>
+                        </div>
+                    </form>
+                }
             </div>
+            }
+            else
+            {
+                <div class="shadow p-3 mt-3 ml-auto bg-body rounded col-10">
+                    <blockquote class="blockquote">
+                        <p class="mb-0">[deleted]</p>
+                        <footer class="blockquote-footer">
+                            [deleted] - <cite>
+                                @reply.Date
+                                @if (reply.Edited)
+                                {
+                                    <span>*(edited on @reply.DateEdited)</span>
+                                }
+                            </cite>
+                        </footer>
+                    </blockquote>
+                </div>
+            }
         }
     }
+
+}
 
 
 <script type="text/javascript">
@@ -188,6 +273,24 @@ else
         editForm.style.display = "none";
         relatedButton.innerHTML = "Edit";
         relatedButton.setAttribute("onClick", "ShowEditForm(" + commentId + ")");
+    }
+
+    function ShowReplyForm(commentId) {
+        let editForm = document.getElementById('replyForm_' + commentId);
+        let relatedButton = document.getElementById('replyButton_' + commentId);
+
+        editForm.style.display = "block";
+        relatedButton.innerHTML = "Hide Reply Prompt";
+        relatedButton.setAttribute("onClick", "HideReplyForm(" + commentId + ")");
+    }
+
+    function HideReplyForm(commentId) {
+        let editForm = document.getElementById('replyForm_' + commentId);
+        let relatedButton = document.getElementById('replyButton_' + commentId);
+
+        editForm.style.display = "none";
+        relatedButton.innerHTML = "Reply";
+        relatedButton.setAttribute("onClick", "ShowReplyForm(" + commentId + ")");
     }
 </script>
 

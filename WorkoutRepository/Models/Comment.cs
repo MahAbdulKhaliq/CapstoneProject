@@ -12,6 +12,9 @@ namespace WorkoutRepository.Models
         [Key]
         public int Id { get; set; }
 
+        // Grabs the discriminator for use later
+        public string Discriminator { get; private set; }
+
         // WebsiteUserName attribute of comment creator
         public string Author { get; set; }
         // Identity Id attribute of comment creator
@@ -37,5 +40,6 @@ namespace WorkoutRepository.Models
         public bool Deletable { get; set; } = false;
         // Flag to see if this comment has been deleted
         public bool Deleted { get; set; } = false;
+
     }
 }

@@ -13,6 +13,7 @@ namespace WorkoutRepository.Data
             : base(options)
         {
         }
+
         public DbSet<WorkoutRepository.Models.Exercise> Exercise { get; set; }
         public DbSet<WorkoutRepository.Models.PrimaryEquipment> PrimaryEquipment { get; set; }
         public DbSet<WorkoutRepository.Models.MuscleGroup> MuscleGroup { get; set; }

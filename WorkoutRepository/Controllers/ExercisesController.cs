@@ -122,11 +122,21 @@ namespace WorkoutRepository.Controllers
 
             // Then, grab comments for that exercise
             var comments = from c in _context.Comment
+                           where c.Discriminator == "Comment"
                            select c;
 
             comments = comments.Where(c => c.ExerciseId == id)
                                 .OrderBy(c => c.Deleted)
                                 .ThenByDescending(c => c.Date);
+
+            // Grab replies for that exercise too
+            var replies = from r in _context.Reply
+                          where r.Discriminator == "Reply"
+                          select r;
+
+            replies = replies.Where(r => r.ExerciseId == id)
+                                .OrderBy(r => r.Deleted)
+                                .ThenByDescending(r => r.Date);
 
 
             try
@@ -150,14 +160,28 @@ namespace WorkoutRepository.Controllers
                         comment.Deletable = true;
                     }
                 }
-            }catch(NullReferenceException e)
+                // Same operation with replies
+                foreach (Reply reply in replies)
+                {
+                    if (reply.AuthorId == userId)
+                    {
+                        reply.Editable = true;
+                        reply.Deletable = true;
+                    }
+                    if (User.IsInRole("Admin"))
+                    {
+                        reply.Deletable = true;
+                    }
+                }
+            }catch(NullReferenceException)
             {
-
+                // do nothing
             }
             
             // Finally, place that exercise's comments in the Comments IQueryable object
             // of the Exercise model.
             exercise.Comments = comments;
+            exercise.Replies = replies;
 
             return View(exercise);
         }
@@ -486,6 +510,65 @@ namespace WorkoutRepository.Controllers
 
 
             return RedirectToAction("Details", new { id = comment.ExerciseId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _PostReply([Bind("Id, Author, AuthorId, ExerciseId, Content, Date, Discriminator, ParentCommentId, Editable, Edited, DateEdited, Deletable, Deleted")] Reply reply)
+        {
+
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            string userId = applicationUser.Id;
+
+            // DB processing: adding replies
+
+            reply.AuthorId = userId;
+
+            reply.Date = DateTime.Now;
+            _context.Reply.Add(reply);
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction("Details", new { id = reply.ExerciseId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _EditReply([Bind("Id, Author, AuthorId, ExerciseId, Content, Date, Discriminator, ParentCommentId, Editable, Edited, DateEdited, Deletable, Deleted")] Reply reply)
+        {
+
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            string userId = applicationUser.Id;
+
+            // DB processing: editing replies
+
+            var replyToBeEdited = await _context.Reply
+                .FirstOrDefaultAsync(m => m.Id == reply.Id);
+
+            replyToBeEdited.Content = reply.Content + "*";
+            replyToBeEdited.Edited = true;
+            replyToBeEdited.DateEdited = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction("Details", new { id = reply.ExerciseId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _DeleteReply([Bind("Id, Author, AuthorId, ExerciseId, Content, Date, Discriminator, ParentCommentId, Editable, Edited, DateEdited, Deletable, Deleted")] Reply reply)
+        {
+
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            string userId = applicationUser.Id;
+
+            // DB processing: 'deleting' replies
+
+            var replyToBeDeleted = await _context.Reply
+                .FirstOrDefaultAsync(m => m.Id == reply.Id);
+
+            replyToBeDeleted.Deleted = true;
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction("Details", new { id = reply.ExerciseId });
         }
 
 

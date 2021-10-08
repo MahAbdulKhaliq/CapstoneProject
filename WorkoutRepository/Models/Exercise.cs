@@ -60,5 +60,12 @@ namespace WorkoutRepository.Models
         // Used to hold comments for this exercise upon Details view load
         [NotMapped]
         public IQueryable<Comment> Comments { get; set; }
+
+        // Used for model purposes in appropriate Details.cshtml view
+        [NotMapped]
+        public Reply Reply { get; set; }
+        // Used to hold replies for this exercise upon Details view load
+        [NotMapped]
+        public IQueryable<Reply> Replies { get; set; }
     }
 }
