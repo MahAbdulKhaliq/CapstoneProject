@@ -115,7 +115,7 @@ else
             <blockquote class="blockquote">
                 <p class="mb-0">@comment.Content</p>
                 <footer class="blockquote-footer">
-                    @comment.Author - <cite>
+                    <a asp-controller="Profiles" asp-action="Details" asp-route-id="@comment.AuthorId">@comment.Author</a> - <cite>
                     @comment.Date
                     @if (comment.Edited)
                     {
@@ -196,7 +196,7 @@ else
                     <blockquote class="blockquote">
                         <p class="mb-0">@reply.Content</p>
                         <footer class="blockquote-footer">
-                            @reply.Author - <cite>
+                            <a asp-controller="Profiles" asp-action="Details" asp-route-id="@reply.AuthorId">@reply.Author</a> - <cite>
                             @reply.Date
                             @if (reply.Edited)
                             {

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using WorkoutRepository.Data;
 using WorkoutRepository.Models;
 
 namespace WorkoutRepository.Areas.Identity.Pages.Account
@@ -25,16 +26,21 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
+        // Importing DB Context for creating user profile upon registration
+        private readonly ApplicationDbContext _context;
+
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [BindProperty]
@@ -88,6 +94,8 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FirstName = Input.FirstName, LastName = Input.LastName, WebsiteUserName = Input.WebsiteUserName };
+                // Create a profile for this user too
+                var profile = new Profile { UserId = user.Id, WebsiteUserName = Input.WebsiteUserName, AboutMe = "", ShowHealthMetrics = false, Weight = 0, BodyFat = 0, Height = 0, ProfileImageResource = "", MemberSince = DateTime.Now };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -100,6 +108,10 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account
                         pageHandler: null,
                         values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
+
+                    // On success, create a profile
+                    _context.Add(profile);
+                    await _context.SaveChangesAsync();
 
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");

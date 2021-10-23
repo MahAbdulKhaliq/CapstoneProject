@@ -20,5 +20,6 @@ namespace WorkoutRepository.Data
         public DbSet<WorkoutRepository.Models.FavouriteExercise> FavouriteExercise { get; set; }
         public DbSet<WorkoutRepository.Models.Comment> Comment { get; set; }
         public DbSet<WorkoutRepository.Models.Reply> Reply { get; set; }
+        public DbSet<WorkoutRepository.Models.Profile> Profile { get; set; }
     }
 }

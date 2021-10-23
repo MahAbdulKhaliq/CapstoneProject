@@ -1,0 +1,89 @@
+﻿@model WorkoutRepository.Models.Profile
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userId = "";
+}
+
+
+
+@if (SignInManager.IsSignedIn(User))
+{
+    bool isAdmin = User.IsInRole("Admin");
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user.WebsiteUserName;
+
+    userId = UserManager.GetUserId(User);
+
+
+}
+
+<div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        @if (@Model.UserId == @userId)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.UserId">Edit</a>
+        }
+    }
+</div>
+
+<h1>Profile</h1>
+
+<div>
+    <h4>@Html.DisplayFor(model => model.WebsiteUserName)</h4>
+
+    <div class="d-flex justify-content-center">
+        <div class="p-2">
+            <img class="align-middle" src="~/images/profile/@Model.ProfileImageResource" style="width:300px" />
+        </div>
+    </div>
+
+
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MemberSince)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MemberSince)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AboutMe)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AboutMe)
+        </dd>
+    </dl>
+
+    @if (Model.ShowHealthMetrics)
+    {
+        <h4>Health Metrics</h4>
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Weight)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Weight)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.BodyFat)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.BodyFat)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Height)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Height)
+            </dd>
+        </dl>
+    }
+</div>
+

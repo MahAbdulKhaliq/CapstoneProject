@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using WorkoutRepository.Data;
 using WorkoutRepository.Models;
 
 namespace WorkoutRepository.Areas.Identity.Pages.Account.Manage
@@ -15,12 +17,17 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
+        // Importing DB Context for updating user profile username
+        private readonly ApplicationDbContext _context;
+
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         //public string Username { get; set; }
@@ -113,6 +120,14 @@ namespace WorkoutRepository.Areas.Identity.Pages.Account.Manage
             user.LastName = Input.LastName;
             user.WebsiteUserName = Input.WebsiteUserName;
             await _userManager.UpdateAsync(user);
+
+            var profile = await _context.Profile
+                            .FirstOrDefaultAsync(p => p.UserId == _userManager.GetUserId(User));
+                           //where p.UserId == _userManager.GetUserId(User)
+                           //select p;
+
+            profile.WebsiteUserName = Input.WebsiteUserName;
+            await _context.SaveChangesAsync();
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";

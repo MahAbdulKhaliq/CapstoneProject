@@ -1,0 +1,71 @@
+﻿@model WorkoutRepository.Models.Profile
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Profile</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="WebsiteUserName" />
+            <input type="hidden" asp-for="MemberSince" />
+
+            <div class="form-group">
+                <label asp-for="ProfileImageResource" class="control-label"></label>
+                <input type="hidden" asp-for="ProfileImageResource" class="form-control" />
+                <span asp-validation-for="ProfileImageResource" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Current Image</label>
+                <img src="~/images/profile/@Model.ProfileImageResource" class="card-img-top" style="width:300px" />
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" accept="image/*" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="AboutMe" class="control-label"></label>
+                <input asp-for="AboutMe" class="form-control" />
+                <span asp-validation-for="AboutMe" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="ShowHealthMetrics" /> @Html.DisplayNameFor(model => model.ShowHealthMetrics)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Weight" class="control-label"></label>
+                <input asp-for="Weight" class="form-control" />
+                <span asp-validation-for="Weight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BodyFat" class="control-label"></label>
+                <input asp-for="BodyFat" class="form-control" />
+                <span asp-validation-for="BodyFat" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Height" class="control-label"></label>
+                <input asp-for="Height" class="form-control" />
+                <span asp-validation-for="Height" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Details" asp-route-id="@Model.UserId">Back to Profile</a>
+</div>
+
