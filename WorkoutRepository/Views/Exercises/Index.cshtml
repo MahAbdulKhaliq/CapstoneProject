@@ -81,7 +81,16 @@
             percentRating = Math.Round(percentRating, 2);
         <tr>
             <td>
-                <img src="~/images/@item.ImageResource" class="card-img-top" style="width: 100px" />
+                @if (item.ImageResource == null)
+                {
+                    <div class="d-flex justify-content-center">
+                        <i class="fas fa-camera" style="font-size: 4em"></i>
+                    </div>
+                }
+                else
+                {
+                    <img src="~/images/@item.ImageResource" class="card-img-top" style="width: 100px" />
+                }              
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>

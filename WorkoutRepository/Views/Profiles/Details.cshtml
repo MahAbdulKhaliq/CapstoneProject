@@ -64,7 +64,14 @@
     </dl>
 
     <h4>@Html.DisplayNameFor(model => model.AboutMe)</h4>
-    <div class="shadow p-3 mb-4 bg-body rounded" style="white-space: pre-line">@Model.AboutMe</div>
+    @if (Model.AboutMe == null)
+    {
+        <div class="shadow p-3 mb-4 bg-body rounded" style="white-space: pre-line; font-style:italic">N/A</div>
+    }
+    else { 
+        <div class="shadow p-3 mb-4 bg-body rounded" style="white-space: pre-line">@Model.AboutMe</div>
+    }
+    
 
     @if (Model.ShowHealthMetrics)
     {

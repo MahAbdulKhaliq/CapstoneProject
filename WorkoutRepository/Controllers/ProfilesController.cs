@@ -27,9 +27,14 @@ namespace WorkoutRepository.Controllers
             _userManager = userManager;
         }
 
+        [Authorize]
         // GET: Profiles
         public async Task<IActionResult> Index()
         {
+            if (!User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
             return View(await _context.Profile.ToListAsync());
         }
 
@@ -52,9 +57,14 @@ namespace WorkoutRepository.Controllers
             return View(profile);
         }
 
+        [Authorize]
         // GET: Profiles/Create
         public IActionResult Create()
         {
+            if (!User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
             return View();
         }
 
@@ -101,6 +111,7 @@ namespace WorkoutRepository.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(string id, [Bind("UserId,WebsiteUserName,AboutMe,ShowHealthMetrics,Weight,BodyFat,Height,ProfileImageResource,ImageFile,MemberSince")] Profile profile)
         {
             if (id != profile.UserId)
@@ -169,12 +180,19 @@ namespace WorkoutRepository.Controllers
         }
 
         // GET: Profiles/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+
+            if (!User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
 
             var profile = await _context.Profile
                 .FirstOrDefaultAsync(m => m.UserId == id);
@@ -189,6 +207,7 @@ namespace WorkoutRepository.Controllers
         // POST: Profiles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var profile = await _context.Profile.FindAsync(id);
