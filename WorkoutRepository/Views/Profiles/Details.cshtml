@@ -28,7 +28,7 @@
     {
         @if (@Model.UserId == @userId)
         {
-            <a asp-action="Edit" asp-route-id="@Model.UserId">Edit</a>
+            <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary">Edit</a>
         }
     }
 </div>
@@ -40,7 +40,15 @@
 
     <div class="d-flex justify-content-center">
         <div class="p-2">
-            <img class="align-middle" src="~/images/profile/@Model.ProfileImageResource" style="width:300px" />
+            @if (Model.ProfileImageResource == null)
+            {
+                <i class="far fa-user" style="font-size: 15em"></i>
+            }
+            else
+            {
+                <img class="align-middle" src="~/images/profile/@Model.ProfileImageResource" style="width:300px" />
+            }
+
         </div>
     </div>
 
@@ -53,13 +61,10 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.MemberSince)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.AboutMe)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.AboutMe)
-        </dd>
     </dl>
+
+    <h4>@Html.DisplayNameFor(model => model.AboutMe)</h4>
+    <div class="shadow p-3 mb-4 bg-body rounded" style="white-space: pre-line">@Model.AboutMe</div>
 
     @if (Model.ShowHealthMetrics)
     {
@@ -69,19 +74,19 @@
                 @Html.DisplayNameFor(model => model.Weight)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Weight)
+                @Html.DisplayFor(model => model.Weight) kgs
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.BodyFat)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.BodyFat)
+                @Html.DisplayFor(model => model.BodyFat)%
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Height)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Height)
+                @Html.DisplayFor(model => model.Height) m
             </dd>
         </dl>
     }
