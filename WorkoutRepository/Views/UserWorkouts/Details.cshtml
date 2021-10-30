@@ -9,21 +9,11 @@
 
 <div>
     <h4>@Html.DisplayFor(model => model.WorkoutName)</h4>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit Workout Name</a> |
+        <a asp-action="Index">Back to List</a>
+    </div>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.WorkoutName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.WorkoutName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-    </dl>
 </div>
 
 
@@ -32,41 +22,98 @@
     <h4>Add Exercise to Workout</h4>
     <form asp-action="_AddExercise">
         <input asp-for="UserWorkoutExercise.UserWorkoutId" value="@Model.Id" readonly hidden />
-        <p>Exercise Name:</p>
-        <select asp-for="UserWorkoutExercise.ExerciseId" asp-items="ViewBag.ExerciseList"></select>
-        <p>Number of Sets:</p>
-        <input type="number" asp-for="UserWorkoutExercise.Sets" min="1" max="6"/>
-        <br />
-        <button type="submit" class="btn btn-primary mt-2">Add Exercise</button>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    Exercise Name:
+                </div>
+                <div class="col-sm">
+                    Number of Sets:
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <select asp-for="UserWorkoutExercise.ExerciseId" asp-items="ViewBag.ExerciseList"></select>
+                </div>
+                <div class="col-sm">
+                    <input type="number" asp-for="UserWorkoutExercise.Sets" min="1" max="6" value="1" />
+                </div>
+            </div>
+            <div class="row">
+                <button type="submit" class="btn btn-primary mt-2">Add Exercise</button>
+            </div>
+        </div>
     </form>
 </div>
-
+<hr />
 <div>
     <h4>Exercises in this Workout</h4>
     <ul>
-        <li>Item: [x] Sets [Edit | Delete]</li>
         @foreach (var exercise in Model.UserWorkoutExercises)
         {
             <li id="exercise_@exercise.Id">
             <a asp-controller="Exercises" asp-action="Details" asp-route-id="@exercise.ExerciseId">@exercise.ExerciseName</a>: @exercise.Sets Sets 
-                <button id="editButton_@exercise.Id" class="btn btn-primary" onclick="ShowEditForm(@exercise.Id)">Edit</button> <button id="deleteButton_@exercise.Id" class="btn btn-danger">Delete</button>
+                <button id="editButton_@exercise.Id" class="btn btn-primary" onclick="ShowEditForm(@exercise.Id)">Edit</button> <button id="deleteButton_@exercise.Id" class="btn btn-danger" onclick="DeleteExercise(@exercise.Id,@exercise.UserWorkoutId)">Delete</button>
             </li>
             <li id="exercise_editPrompt_@exercise.Id" style="display: none;">
-
+                <form asp-action="_EditExercise">
+                    <input asp-for="UserWorkoutExercise.Id" value="@exercise.Id" readonly hidden />
+                    <input asp-for="UserWorkoutExercise.UserWorkoutId" value="@Model.Id" readonly hidden />
+                    <select asp-for="UserWorkoutExercise.ExerciseId" asp-items="ViewBag.ExerciseList"></select>
+                    <input type="number" asp-for="UserWorkoutExercise.Sets" min="1" max="6" value="@exercise.Sets"/> Sets
+                    <button type="submit" class="btn btn-primary">Update Exercise</button>
+                </form>
+                <button id="editButton_@exercise.Id" class="btn btn-secondary" onclick="HideEditForm(@exercise.Id)">Hide</button>
             </li>
         }
 
     </ul>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit Workout Name</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 <script type="text/javascript">
 
-    function showEditForm(userWorkoutExerciseId) {
 
+    /**
+     * Shows the edit form for the appropriate user workout exercise
+     * param userWorkoutExerciseId the ID for the userWorkoutExercise
+     */
+    function ShowEditForm(userWorkoutExerciseId) {
+        let originalForm = document.getElementById('exercise_' + userWorkoutExerciseId)
+        let editForm = document.getElementById('exercise_editPrompt_' + userWorkoutExerciseId)
+
+        originalForm.style.display = "none";
+        editForm.style.display = "block";
+    }
+
+    /**
+     * Hides the edit form for the appropriate user workout exercise
+     * param userWorkoutExerciseId the ID for the userWorkoutExercise
+     */
+    function HideEditForm(userWorkoutExerciseId) {
+        let originalForm = document.getElementById('exercise_' + userWorkoutExerciseId)
+        let editForm = document.getElementById('exercise_editPrompt_' + userWorkoutExerciseId)
+
+        originalForm.style.display = "block";
+        editForm.style.display = "none";
+    }
+
+    /**
+     * Deletes the related UserWorkoutexercise
+     * param userWorkoutExerciseId the ID for the userWorkoutExercise
+     * param userWorkoutExerciseId the ID for the userWorkout (redundant as page reloads in this function)
+     */
+    function DeleteExercise(userWorkoutExerciseId, workoutId) {
+        var url = '@Url.Action("_DeleteExercise", "UserWorkouts")';
+
+        // Perform the _DeleteExercise action in UserWorkouts
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { id: userWorkoutExerciseId, workoutId: workoutId }
+        }).done(function () {
+            location.reload();
+        })
     }
 
 </script>

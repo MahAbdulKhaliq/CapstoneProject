@@ -191,6 +191,19 @@ namespace WorkoutRepository.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var userWorkout = await _context.UserWorkout.FindAsync(id);
+
+            // Grab the exercises in said workout to delete them too
+            var relatedExercises = from uWorkoutExercises in _context.UserWorkoutExercise
+                                   select uWorkoutExercises;
+
+            relatedExercises = relatedExercises.Where(r => r.UserWorkoutId == id);
+
+            foreach (UserWorkoutExercise exercise in relatedExercises)
+            {
+                _context.UserWorkoutExercise.Remove(exercise);
+            }
+
+
             _context.UserWorkout.Remove(userWorkout);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -218,6 +231,49 @@ namespace WorkoutRepository.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Details", new { id = userWorkoutExercise.UserWorkoutId});
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _EditExercise([Bind("Id, ExerciseId, ExerciseName, UserWorkoutId, Sets")] UserWorkoutExercise userWorkoutExercise)
+        {
+            // Grabs the user ID
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            string userId = applicationUser?.Id;
+
+            // DB processing: editing user workout exercise
+
+            var exerciseToBeEdited = await _context.UserWorkoutExercise
+                .FirstOrDefaultAsync(e => e.Id == userWorkoutExercise.Id);
+
+            // Grabbing the related exercise to pull its name into the userWorkoutExercise
+            var relatedExercise = await _context.Exercise
+                .FirstOrDefaultAsync(e => e.Id == userWorkoutExercise.ExerciseId);
+
+            // Updating the exercise
+            exerciseToBeEdited.ExerciseId = userWorkoutExercise.ExerciseId;
+            exerciseToBeEdited.ExerciseName = relatedExercise.Name;
+            exerciseToBeEdited.Sets = userWorkoutExercise.Sets;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = userWorkoutExercise.UserWorkoutId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> _DeleteExercise(int id, int workoutId)
+        {
+            // Grabs the user ID
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            string userId = applicationUser?.Id;
+
+            // DB processing: editing user workout exercise
+
+            var exerciseToBeDeleted = await _context.UserWorkoutExercise
+                .FirstOrDefaultAsync(e => e.Id == id);
+            // Removes the exercise
+            _context.UserWorkoutExercise.Remove(exerciseToBeDeleted);
+            await _context.SaveChangesAsync();
+            // Returns to the Details page of the related userWorkout
+            return RedirectToAction("Details", new { id = workoutId });
         }
     }
 }
