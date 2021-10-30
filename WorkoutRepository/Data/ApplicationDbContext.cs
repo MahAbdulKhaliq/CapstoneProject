@@ -21,5 +21,7 @@ namespace WorkoutRepository.Data
         public DbSet<WorkoutRepository.Models.Comment> Comment { get; set; }
         public DbSet<WorkoutRepository.Models.Reply> Reply { get; set; }
         public DbSet<WorkoutRepository.Models.Profile> Profile { get; set; }
+        public DbSet<WorkoutRepository.Models.UserWorkout> UserWorkout { get; set; }
+        public DbSet<WorkoutRepository.Models.UserWorkoutExercise> UserWorkoutExercise { get; set; }
     }
 }

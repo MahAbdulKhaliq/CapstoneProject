@@ -8,6 +8,10 @@
   <ItemGroup>
     <Compile Remove="Data\Migrations\20210918203421_LinkingForeignKeys.cs" />
     <Compile Remove="Data\Migrations\20210918203421_LinkingForeignKeys.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211030005201_UserWorkouts.cs" />
+    <Compile Remove="Data\Migrations\20211030005201_UserWorkouts.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211030005313_UserWorkouts.cs" />
+    <Compile Remove="Data\Migrations\20211030005313_UserWorkouts.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,72 @@
+﻿@model WorkoutRepository.Models.UserWorkout
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>@Html.DisplayFor(model => model.WorkoutName)</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.WorkoutName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.WorkoutName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UserId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UserId)
+        </dd>
+    </dl>
+</div>
+
+
+
+<div>
+    <h4>Add Exercise to Workout</h4>
+    <form asp-action="_AddExercise">
+        <input asp-for="UserWorkoutExercise.UserWorkoutId" value="@Model.Id" readonly hidden />
+        <p>Exercise Name:</p>
+        <select asp-for="UserWorkoutExercise.ExerciseId" asp-items="ViewBag.ExerciseList"></select>
+        <p>Number of Sets:</p>
+        <input type="number" asp-for="UserWorkoutExercise.Sets" min="1" max="6"/>
+        <br />
+        <button type="submit" class="btn btn-primary mt-2">Add Exercise</button>
+    </form>
+</div>
+
+<div>
+    <h4>Exercises in this Workout</h4>
+    <ul>
+        <li>Item: [x] Sets [Edit | Delete]</li>
+        @foreach (var exercise in Model.UserWorkoutExercises)
+        {
+            <li id="exercise_@exercise.Id">
+            <a asp-controller="Exercises" asp-action="Details" asp-route-id="@exercise.ExerciseId">@exercise.ExerciseName</a>: @exercise.Sets Sets 
+                <button id="editButton_@exercise.Id" class="btn btn-primary" onclick="ShowEditForm(@exercise.Id)">Edit</button> <button id="deleteButton_@exercise.Id" class="btn btn-danger">Delete</button>
+            </li>
+            <li id="exercise_editPrompt_@exercise.Id" style="display: none;">
+
+            </li>
+        }
+
+    </ul>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit Workout Name</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script type="text/javascript">
+
+    function showEditForm(userWorkoutExerciseId) {
+
+    }
+
+</script>

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkoutRepository.Data;
 
 namespace WorkoutRepository.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211030005635_UserWorkouts")]
+    partial class UserWorkouts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -424,9 +426,6 @@ namespace WorkoutRepository.Data.Migrations
                     b.Property<int>("ExerciseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ExerciseName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Sets")
                         .HasColumnType("int");
 
@@ -434,6 +433,8 @@ namespace WorkoutRepository.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
 
                     b.ToTable("UserWorkoutExercise");
                 });
@@ -510,6 +511,15 @@ namespace WorkoutRepository.Data.Migrations
                     b.HasOne("WorkoutRepository.Models.PrimaryEquipment", "PrimaryEquipment")
                         .WithMany()
                         .HasForeignKey("PrimaryEquipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("WorkoutRepository.Models.UserWorkoutExercise", b =>
+                {
+                    b.HasOne("WorkoutRepository.Models.Exercise", "Exercise")
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
