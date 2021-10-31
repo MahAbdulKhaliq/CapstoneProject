@@ -4,16 +4,6 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    int uniqueItems = 0;
-    @foreach (var item in Model)
-    {
-        if (item.SetNumber == 1)
-        {
-            uniqueItems++;
-        }
-    }
-
-    String mostRecentExercise = "";
 }
 
 
@@ -31,12 +21,12 @@
         <p>Looking to add workouts?</p>
     </div>
     <div class="row justify-content-around justify-content-md-center">
-        <p>Head over to the <a>My Workouts</a> page</p>
+        <p>Head over to the <a asp-controller="UserWorkouts" asp-action="Index">My Workouts</a> page</p>
     </div>
 </div>
 
 <div class="container">
-    <div class="row">
+    <div class="row justify-content-md-center">
         <div class="col">
             <h4>Date: </h4>
         </div>
@@ -44,9 +34,9 @@
             <h4>Select Workout: </h4>
         </div>
     </div>
-    <div class="row">
+    <div class="row justify-content-md-center">
         <div class="col">
-            <form method="post" enctype="multipart/form-data" asp-action="Index">
+            <form method="get" enctype="multipart/form-data" asp-action="Index">
                 <input type="date" id="datePicker" name="dateFor" value="@ViewBag.LoadedDate" />
                 <input type="submit" value="Change Date" class="btn btn-primary" />
             </form>
@@ -59,6 +49,16 @@
             </form>
         </div>
     </div>
+    @if (Model.Any())
+    {
+        <div class="row justify-content-md-center">
+            <div class="col">
+            </div>
+            <div class="col">
+                <p><i class="fas fa-info-circle"></i>Overwriting your previous workout for the day will overwrite previous data.</p>
+            </div>
+        </div>        
+    }
 </div>
 
 <table class="table mt-5">
@@ -90,21 +90,18 @@
                 @Html.DisplayFor(modelItem => item.SetNumber)
             </td>
             <td>
-                <input id="weight_@item.Id" type="text" value="@item.Weight" /> lbs
-                @*@Html.DisplayFor(modelItem => item.Weight)*@
+                <input id="weight_@item.Id" type="number" min="0" max="999" value="@item.Weight" /> lbs
             </td>
             <td>
-                <input id="reps_@item.Id" type="text" value="@item.Reps" />
-                @*@Html.DisplayFor(modelItem => item.Reps)*@
+                <input id="reps_@item.Id" type="number" min="0" max="999" value="@item.Reps" />
             </td>
             <td>
-                @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
-                <button class="btn btn-success">Save</button>
+                <button class="btn btn-success" onclick="SaveWorkoutLog(@item.Id)">Save</button>
             </td>
             <td>
-                Saved!
+                <div id="savedMessage_@item.Id" style="color: green; display: none;">
+                    <i class="fas fa-save"></i> Saved!
+                </div>
             </td>
         </tr>
 }
@@ -114,38 +111,20 @@
 <script type="text/javascript">
 
     function SaveWorkoutLog(workoutLogId) {
-        let weightValue = document.getElementById('weight_' + workoutLogId);
-        let repValue = document.getElementById('reps_' + workoutLogId);
-        var url = '@Url.Action("_SaveWorkout", "UserWorkouts")';
+        let weightValue = document.getElementById('weight_' + workoutLogId).value;
+        let repValue = document.getElementById('reps_' + workoutLogId).value;
+        let savedMessage = document.getElementById('savedMessage_' + workoutLogId);
+        console.log(weightValue);
+        console.log(repValue);
+        var url = '@Url.Action("_SaveWorkout", "WorkoutLogs")';
 
         $.ajax({
             url: url,
             type: 'POST',
-            data: { id: workoutLogId, weight: weightValue, reps: repValue }
+            data: { workoutId: workoutLogId, weight: weightValue, reps: repValue }
         }).done(function () {
-            // TO-DO:
+            savedMessage.style.display = "block";
         });
-    }
-    function SaveAll() {
-
-    }
-
-    /**
-     * Deletes the related UserWorkoutexercise
-     * param userWorkoutExerciseId the ID for the userWorkoutExercise
-     * param userWorkoutExerciseId the ID for the userWorkout (redundant as page reloads in this function)
-     */
-    function DeleteExercise(userWorkoutExerciseId, workoutId) {
-        var url = '@Url.Action("_DeleteExercise", "UserWorkouts")';
-
-        // Perform the _DeleteExercise action in UserWorkouts
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: { id: userWorkoutExerciseId, workoutId: workoutId }
-        }).done(function () {
-            location.reload();
-        })
     }
 
 </script>

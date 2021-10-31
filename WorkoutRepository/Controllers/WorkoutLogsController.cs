@@ -26,32 +26,14 @@ namespace WorkoutRepository.Controllers
 
         // GET: WorkoutLogs
         [Authorize]
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(string? dateFor)
         {
-            // Grabs the user ID
-            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
-            string userId = applicationUser?.Id;
+            if (dateFor == null)
+            {
+                dateFor = DateTime.Today.ToString("yyyy-MM-dd");
+            }
 
-            // Grabs the user's workouts and places them in a SelectList for the View to use
-            ViewBag.WorkoutList = new SelectList(_context.UserWorkout.Where(w => w.UserId == userId), "Id", "WorkoutName");
-            ViewBag.LoadedDate = DateTime.Today.ToString("yyyy-MM-dd");
-
-            var userQuery = from workoutLog in _context.WorkoutLog
-                            select workoutLog;
-
-            userQuery = userQuery.Where(w => w.UserId == userId).Where(w => w.DateFor == DateTime.Today);
-
-            var finalQuery = await userQuery.ToListAsync();
-
-            return View(finalQuery);
-        }
-
-        // POST: WorkoutLogs
-        // Used to change the date for the currently viewed Index page
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Index(string dateFor)
-        {
             // Grabs the user ID
             ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
             string userId = applicationUser?.Id;
@@ -139,9 +121,10 @@ namespace WorkoutRepository.Controllers
             var finalQuery = await userQuery.ToListAsync();
 
             // TO-DO: Return to previously listed date
-            return RedirectToAction("Index", new { dateFor });
+            return RedirectToAction("Index", new { dateFor = dateFor });
         }
 
+        [HttpPost]
         public async Task<IActionResult> _SaveWorkout(int workoutId, int weight, int reps)
         {
             
