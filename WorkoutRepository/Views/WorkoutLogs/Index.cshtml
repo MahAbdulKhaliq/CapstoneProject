@@ -1,0 +1,151 @@
+﻿@model IEnumerable<WorkoutRepository.Models.WorkoutLog>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    int uniqueItems = 0;
+    @foreach (var item in Model)
+    {
+        if (item.SetNumber == 1)
+        {
+            uniqueItems++;
+        }
+    }
+
+    String mostRecentExercise = "";
+}
+
+
+<div class="container">
+    <div class="row justify-content-around justify-content-md-center">
+        <h1>Workout Log</h1>
+    </div>
+    <div class="row justify-content-around justify-content-md-center">
+        <p>Welcome to the Workout Log page!</p>
+    </div>
+    <div class="row justify-content-around justify-content-md-center">
+        <p>This page lets you log your workout routine using exercises features on the website.</p>
+    </div>
+    <div class="row justify-content-around justify-content-md-center">
+        <p>Looking to add workouts?</p>
+    </div>
+    <div class="row justify-content-around justify-content-md-center">
+        <p>Head over to the <a>My Workouts</a> page</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h4>Date: </h4>
+        </div>
+        <div class="col">
+            <h4>Select Workout: </h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form method="post" enctype="multipart/form-data" asp-action="Index">
+                <input type="date" id="datePicker" name="dateFor" value="@ViewBag.LoadedDate" />
+                <input type="submit" value="Change Date" class="btn btn-primary" />
+            </form>
+        </div>
+        <div class="col">
+            <form method="post" enctype="multipart/form-data" asp-action="SetWorkout">
+                <input type="date" id="datePicker" name="dateFor" value="@ViewBag.LoadedDate" hidden />
+                <select asp-items="ViewBag.WorkoutList" name="workoutId"></select>
+                <input type="submit" value="Set Workout" class="btn btn-primary" />
+            </form>
+        </div>
+    </div>
+</div>
+
+<table class="table mt-5">
+    <thead>
+        <tr>
+            <th>
+                Exercise Name
+            </th>
+            <th>
+                Set #
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Weight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reps)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                <a asp-controller="Exercises" asp-action="Details" asp-route-id="@item.ExerciseId">@Html.DisplayFor(modelItem => item.ExerciseName)</a>
+</td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SetNumber)
+            </td>
+            <td>
+                <input id="weight_@item.Id" type="text" value="@item.Weight" /> lbs
+                @*@Html.DisplayFor(modelItem => item.Weight)*@
+            </td>
+            <td>
+                <input id="reps_@item.Id" type="text" value="@item.Reps" />
+                @*@Html.DisplayFor(modelItem => item.Reps)*@
+            </td>
+            <td>
+                @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+                <button class="btn btn-success">Save</button>
+            </td>
+            <td>
+                Saved!
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<script type="text/javascript">
+
+    function SaveWorkoutLog(workoutLogId) {
+        let weightValue = document.getElementById('weight_' + workoutLogId);
+        let repValue = document.getElementById('reps_' + workoutLogId);
+        var url = '@Url.Action("_SaveWorkout", "UserWorkouts")';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { id: workoutLogId, weight: weightValue, reps: repValue }
+        }).done(function () {
+            // TO-DO:
+        });
+    }
+    function SaveAll() {
+
+    }
+
+    /**
+     * Deletes the related UserWorkoutexercise
+     * param userWorkoutExerciseId the ID for the userWorkoutExercise
+     * param userWorkoutExerciseId the ID for the userWorkout (redundant as page reloads in this function)
+     */
+    function DeleteExercise(userWorkoutExerciseId, workoutId) {
+        var url = '@Url.Action("_DeleteExercise", "UserWorkouts")';
+
+        // Perform the _DeleteExercise action in UserWorkouts
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { id: userWorkoutExerciseId, workoutId: workoutId }
+        }).done(function () {
+            location.reload();
+        })
+    }
+
+</script>
