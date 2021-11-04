@@ -19,25 +19,17 @@
 
 <script type="text/javascript">
     window.onload = (event) => {
-        console.log("Page is loaded.");
-        console.log(window.location.href);
-        console.log('@isSignedIn');
-        console.log('@userId');
 
+        // Turning the 'IsSignedIn' attribute to a JS-readable format
         var jsIsSignedIn = @isSignedIn.ToString().ToLower();
-        console.log(jsIsSignedIn);
-        console.log(typeof jsIsSignedIn);
-
+        // If signed in, log viewed page
         if (jsIsSignedIn) {
             var url = '@Url.Action("CreateUserStats", "UserStats")';
-            console.log(url);
-
             $.ajax({
                 url: url,
                 type: 'POST',
                 data: { userId: '@userId', url: window.location.href }
             }).done(function () {
-                console.log("Saved user stats item");
             });
         }
     };
