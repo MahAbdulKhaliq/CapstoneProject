@@ -24,5 +24,6 @@ namespace WorkoutRepository.Data
         public DbSet<WorkoutRepository.Models.UserWorkout> UserWorkout { get; set; }
         public DbSet<WorkoutRepository.Models.UserWorkoutExercise> UserWorkoutExercise { get; set; }
         public DbSet<WorkoutRepository.Models.WorkoutLog> WorkoutLog { get; set; }
+        public DbSet<WorkoutRepository.Models.UserStats> UserStats { get; set; }
     }
 }

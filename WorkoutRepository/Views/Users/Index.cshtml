@@ -24,7 +24,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.WebsiteUserName)
+                <a asp-controller="Profiles" asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.WebsiteUserName)</a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.FirstName)

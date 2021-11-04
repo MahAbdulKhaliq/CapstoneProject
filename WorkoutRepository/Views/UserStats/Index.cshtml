@@ -1,0 +1,58 @@
+﻿@model IEnumerable<WorkoutRepository.Models.UserStats>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>User Statistics</h1>
+@if (ViewBag.SelectedUserName != null)
+{
+    <h2>Viewing User Statistics for @ViewBag.SelectedUserName</h2>
+    <a asp-controller="Profiles" asp-action="Details" asp-route-id="@ViewBag.SelectedUserId" class="btn btn-success">View Profile</a>
+}
+else
+{
+    <h2>All Users</h2>
+}
+
+<h3>Filter by User:</h3>
+<form method="get" enctype="multipart/form-data" asp-action="Index">
+    <select asp-items="ViewBag.UserList" name="userId" value="@ViewBag.SelectedUserId"></select>
+    <input type="submit" value="Filter User" class="btn btn-primary" />
+</form>
+
+<a asp-controller="UserStats" asp-action="Index" class="btn btn-secondary mb-2">Clear Filter</a>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IpAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateViewed)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Url)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IpAddress)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateViewed)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Url)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

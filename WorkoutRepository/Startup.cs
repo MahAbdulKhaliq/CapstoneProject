@@ -58,6 +58,10 @@ namespace WorkoutRepository
                 //Various Razor Page authentications can go here
                 
             });
+
+
+            // Adds HttpContextAccessor for logging base URL
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
