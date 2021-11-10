@@ -28,6 +28,12 @@ else
 <table class="table">
     <thead>
         <tr>
+            @if (ViewBag.SelectedUserName == null)
+            {
+            <th>
+                User ID
+            </th>
+            }
             <th>
                 @Html.DisplayNameFor(model => model.IpAddress)
             </th>
@@ -42,17 +48,23 @@ else
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+        <tr>
+            @if (ViewBag.SelectedUserName == null)
+            {
                 <td>
-                    @Html.DisplayFor(modelItem => item.IpAddress)
+                    <a asp-controller="Profiles" asp-action="Details" asp-route-id="@item.UserId">@Html.DisplayFor(modelItem => item.UserId)</a>
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateViewed)
-                </td>
-                <td>
-                    <a href="@item.Url">@Html.DisplayFor(modelItem => item.Url)</a>
-                </td>
-            </tr>
+            }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IpAddress)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateViewed)
+                    </td>
+                    <td>
+                        <a href="@item.Url">@Html.DisplayFor(modelItem => item.Url)</a>
+                    </td>
+                </tr>
         }
     </tbody>
 </table>
