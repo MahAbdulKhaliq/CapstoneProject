@@ -1,0 +1,57 @@
+﻿@model IEnumerable<WorkoutRepository.Models.ExerciseStats>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center">Exercise Statistics</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Views)
+            </th>
+            <th>
+                Ratings
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NumberOfComments)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IncludedInWorkouts)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlacedInLog)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExerciseName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Views)
+            </td>
+            <td>
+                Rating Placeholder
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumberOfComments)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IncludedInWorkouts)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PlacedInLog)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

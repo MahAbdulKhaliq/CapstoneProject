@@ -20,8 +20,9 @@ namespace WorkoutRepository.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "Admin")]
+        
         // GET: UserStats
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string? userId)
         {
             var query = from userStat in _context.UserStats
