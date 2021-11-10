@@ -270,6 +270,17 @@ else
 
 <script type="text/javascript">
 
+    window.onload = (event) => {
+
+        var url = '@Url.Action("CreateViewedExercise","Exercises")'
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {exerciseId: '@Model.Id'}
+        })
+    };
+
 
     function ShowEditForm(commentId) {
         let editForm = document.getElementById('editForm_' + commentId);

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkoutRepository.Data;
 
 namespace WorkoutRepository.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211110024841_ExerciseStatsIDUpdate2")]
+    partial class ExerciseStatsIDUpdate2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -477,30 +479,6 @@ namespace WorkoutRepository.Data.Migrations
                     b.ToTable("UserWorkoutExercise");
                 });
 
-            modelBuilder.Entity("WorkoutRepository.Models.ViewedExercise", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("DateViewed")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ViewedExercise");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ViewedExercise");
-                });
-
             modelBuilder.Entity("WorkoutRepository.Models.WorkoutLog", b =>
                 {
                     b.Property<int>("Id")
@@ -542,20 +520,6 @@ namespace WorkoutRepository.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("Reply");
-                });
-
-            modelBuilder.Entity("WorkoutRepository.Models.IncludedInWorkout", b =>
-                {
-                    b.HasBaseType("WorkoutRepository.Models.ViewedExercise");
-
-                    b.HasDiscriminator().HasValue("IncludedInWorkout");
-                });
-
-            modelBuilder.Entity("WorkoutRepository.Models.PlacedInLog", b =>
-                {
-                    b.HasBaseType("WorkoutRepository.Models.ViewedExercise");
-
-                    b.HasDiscriminator().HasValue("PlacedInLog");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

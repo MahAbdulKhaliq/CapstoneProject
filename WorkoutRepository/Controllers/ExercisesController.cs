@@ -220,9 +220,20 @@ namespace WorkoutRepository.Controllers
                         await exercise.ImageFile.CopyToAsync(fileStream);
                     }
                 }
-                
+
+
                 _context.Add(exercise);
                 await _context.SaveChangesAsync();
+
+                // Adds an ExerciseStats object for this newly added exercise
+                ExerciseStats stats = new ExerciseStats
+                {
+                    ExerciseId = exercise.Id
+                };
+                _context.Add(stats);
+
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(exercise);
@@ -361,6 +372,13 @@ namespace WorkoutRepository.Controllers
             }
 
             _context.Exercise.Remove(exercise);
+
+            // Removes related ExerciseStat object
+            var previousExerciseStat = await _context.ExerciseStats.FirstOrDefaultAsync(e => e.ExerciseId == id);
+
+            _context.Remove(previousExerciseStat);
+
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -570,6 +588,24 @@ namespace WorkoutRepository.Controllers
 
             return RedirectToAction("Details", new { id = reply.ExerciseId });
         }
+
+        
+        [HttpPost]
+        // Creates a 'ViewedExercise' object - used for admin stats
+        public async Task<IActionResult> CreateViewedExercise(int exerciseId)
+        {
+            ViewedExercise viewedExercise = new ViewedExercise
+            {
+                ExerciseId = exerciseId,
+                DateViewed = DateTime.Today
+            };
+
+            _context.Add(viewedExercise);
+            await _context.SaveChangesAsync();
+
+            return new EmptyResult();
+        }
+
 
 
     }

@@ -217,6 +217,8 @@ namespace WorkoutRepository.Controllers
         [HttpPost]
         public async Task<IActionResult> _AddExercise([Bind("Id, ExerciseId, ExerciseName, UserWorkoutId, Sets")]UserWorkoutExercise userWorkoutExercise)
         {
+            
+
             // Grabs the user ID
             ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
             string userId = applicationUser?.Id;
@@ -224,6 +226,10 @@ namespace WorkoutRepository.Controllers
             // Grabbing the related exercise to pull its name into the userWorkoutExercise
             var relatedExercise = await _context.Exercise
                 .FirstOrDefaultAsync(e => e.Id == userWorkoutExercise.ExerciseId);
+
+            // Create a 'included in workout' attribute for admin exercise stat usage
+            CreateIncludedInWorkout(relatedExercise.Id);
+
 
             userWorkoutExercise.ExerciseName = relatedExercise.Name;
 
@@ -274,6 +280,18 @@ namespace WorkoutRepository.Controllers
             await _context.SaveChangesAsync();
             // Returns to the Details page of the related userWorkout
             return RedirectToAction("Details", new { id = workoutId });
+        }
+
+        // Creates a 'ViewedExercise' object w/ a 'IncludedInWorkout' discriminator - used for admin stats
+        public void CreateIncludedInWorkout(int exerciseId)
+        {
+            IncludedInWorkout viewedExercise = new IncludedInWorkout
+            {
+                ExerciseId = exerciseId,
+                DateViewed = DateTime.Today
+            };
+
+            _context.Add(viewedExercise);
         }
     }
 }

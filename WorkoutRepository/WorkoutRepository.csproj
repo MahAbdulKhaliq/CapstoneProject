@@ -12,6 +12,8 @@
     <Compile Remove="Data\Migrations\20211030005201_UserWorkouts.Designer.cs" />
     <Compile Remove="Data\Migrations\20211030005313_UserWorkouts.cs" />
     <Compile Remove="Data\Migrations\20211030005313_UserWorkouts.Designer.cs" />
+    <Compile Remove="Data\Migrations\20211110022513_ExerciseStatsIDUpdate.cs" />
+    <Compile Remove="Data\Migrations\20211110022513_ExerciseStatsIDUpdate.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

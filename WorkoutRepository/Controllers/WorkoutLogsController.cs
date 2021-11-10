@@ -109,6 +109,8 @@ namespace WorkoutRepository.Controllers
                     };
                     _context.Add(log);
                 }
+                // Create a 'placed in log' attribute for admin exercise stat usage
+                CreatePlacedInLog(exercise.ExerciseId);
             }
             await _context.SaveChangesAsync();
 
@@ -145,6 +147,18 @@ namespace WorkoutRepository.Controllers
         private bool WorkoutLogExists(int id)
         {
             return _context.WorkoutLog.Any(e => e.Id == id);
+        }
+
+        // Creates a 'ViewedExercise' object w/'PlacedInLog' discriminator - used for admin stats
+        public void CreatePlacedInLog(int exerciseId)
+        {
+            PlacedInLog viewedExercise = new PlacedInLog
+            {
+                ExerciseId = exerciseId,
+                DateViewed = DateTime.Today
+            };
+
+            _context.Add(viewedExercise);
         }
     }
 }

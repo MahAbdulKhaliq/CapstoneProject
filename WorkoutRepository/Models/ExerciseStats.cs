@@ -9,10 +9,11 @@ namespace WorkoutRepository.Models
 {
     public class ExerciseStats
     {
+        
         [Key]
         public int Id { get; set; }
-        [NotMapped]
-        [Display(Name ="Exercise ID")]
+        [ForeignKey("Exercise")]
+        [Display(Name = "Exercise ID")]
         public int ExerciseId { get; set; }
         [NotMapped]
         [Display(Name = "Exercise Name")]

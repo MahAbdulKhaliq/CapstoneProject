@@ -31,27 +31,35 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ExerciseName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Views)
-            </td>
-            <td>
-                Rating Placeholder
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumberOfComments)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IncludedInWorkouts)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PlacedInLog)
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            double percentRating = Convert.ToDouble(item.PositiveRatings) / Convert.ToDouble(item.PositiveRatings + item.NegativeRatings) * 100;
+            if (Double.IsNaN(percentRating))
+            {
+                percentRating = 0;
+            }
+            percentRating = Math.Round(percentRating, 2);
+
+            <tr>
+                <td>
+                    <a asp-controller="Exercises" asp-action="Details" asp-route-id="@item.ExerciseId">@Html.DisplayFor(modelItem => item.ExerciseName)</a>
+</td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Views)
+                </td>
+                <td>
+                    @percentRating%
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NumberOfComments)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IncludedInWorkouts)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlacedInLog)
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
