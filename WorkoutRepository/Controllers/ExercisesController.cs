@@ -378,6 +378,33 @@ namespace WorkoutRepository.Controllers
 
             _context.Remove(previousExerciseStat);
 
+            // Remove related exercise from UserWorkoutExercises, WorkoutLogs, ViewedExercises
+            var workoutLogQuery = from w in _context.WorkoutLog
+                                  where w.ExerciseId == id
+                                  select w;
+
+            foreach (WorkoutLog log in workoutLogQuery)
+            {
+                _context.Remove(log);
+            }
+
+            var userWorkoutQuery = from w in _context.UserWorkoutExercise
+                                  where w.ExerciseId == id
+                                  select w;
+
+            foreach (UserWorkoutExercise userExercise in userWorkoutQuery)
+            {
+                _context.Remove(userExercise);
+            }
+
+            var viewedExerciseQuery = from e in _context.ViewedExercise
+                                   where e.ExerciseId == id
+                                   select e;
+
+            foreach (ViewedExercise userExercise in viewedExerciseQuery)
+            {
+                _context.Remove(userExercise);
+            }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
