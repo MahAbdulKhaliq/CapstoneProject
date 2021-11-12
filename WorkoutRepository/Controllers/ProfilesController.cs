@@ -28,17 +28,6 @@ namespace WorkoutRepository.Controllers
         }
 
         [Authorize]
-        // GET: Profiles
-        public async Task<IActionResult> Index()
-        {
-            if (!User.IsInRole("Admin"))
-            {
-                return Forbid();
-            }
-            return View(await _context.Profile.ToListAsync());
-        }
-
-        [Authorize]
         // GET: Profiles/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -54,33 +43,6 @@ namespace WorkoutRepository.Controllers
                 return NotFound();
             }
 
-            return View(profile);
-        }
-
-        [Authorize]
-        // GET: Profiles/Create
-        public IActionResult Create()
-        {
-            if (!User.IsInRole("Admin"))
-            {
-                return Forbid();
-            }
-            return View();
-        }
-
-        // POST: Profiles/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,WebsiteUserName,AboutMe,ShowHealthMetrics,Weight,BodyFat,Height,ProfileProfileImageResource,MemberSince")] Profile profile)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(profile);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
             return View(profile);
         }
 
@@ -177,43 +139,6 @@ namespace WorkoutRepository.Controllers
                 return RedirectToAction("Details", new { id = profile.UserId });
             }
             return View(profile);
-        }
-
-        // GET: Profiles/Delete/5
-        [Authorize]
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            if (!User.IsInRole("Admin"))
-            {
-                return Forbid();
-            }
-
-
-            var profile = await _context.Profile
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (profile == null)
-            {
-                return NotFound();
-            }
-
-            return View(profile);
-        }
-
-        // POST: Profiles/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var profile = await _context.Profile.FindAsync(id);
-            _context.Profile.Remove(profile);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool ProfileExists(string id)

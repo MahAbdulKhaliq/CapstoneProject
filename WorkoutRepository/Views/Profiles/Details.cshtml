@@ -40,7 +40,7 @@
 
     <div class="d-flex justify-content-center">
         <div class="p-2">
-            @if (Model.ProfileImageResource == null)
+            @if (Model.ProfileImageResource == null || Model.ProfileImageResource == "")
             {
                 <i class="far fa-user" style="font-size: 15em"></i>
             }
