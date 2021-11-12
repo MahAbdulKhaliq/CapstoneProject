@@ -22,8 +22,40 @@ namespace WorkoutRepository.Controllers
 
         // GET: ExerciseStats
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? timeframe)
         {
+            if (timeframe == null)
+            {
+                timeframe = "AllTime";
+            }
+
+            int daysTimeFrame = 0;
+
+            switch (timeframe)
+            {
+                case "AllTime":
+                    ViewBag.TimeFrameText = "All Time";
+                    break;
+                case "Today":
+                    ViewBag.TimeFrameText = "Today";
+                    daysTimeFrame = -1;
+                    break;
+                case "ThisWeek":
+                    ViewBag.TimeFrameText = "This Week";
+                    daysTimeFrame = -7;
+                    break;
+                case "ThisMonth":
+                    ViewBag.TimeFrameText = "This Month";
+                    daysTimeFrame = -30;
+                    break;
+                case "ThisYear":
+                    ViewBag.TimeFrameText = "This Year";
+                    daysTimeFrame = -365;
+                    break;
+                default:
+                    break;
+            }
+
             var statsQuery = from e in _context.ExerciseStats
                              select e;
 
@@ -53,6 +85,14 @@ namespace WorkoutRepository.Controllers
                                  where v.ExerciseId == stats.ExerciseId
                                  where v.Discriminator == "IncludedInWorkout"
                                  select v;
+
+                if (timeframe != "AllTime")
+                {
+                    commentsQuery = commentsQuery.Where(c => DateTime.Compare(DateTime.Today.AddDays(daysTimeFrame), c.Date) <= 0);
+                    viewsQuery = viewsQuery.Where(v => DateTime.Compare(DateTime.Today.AddDays(daysTimeFrame), v.DateViewed) <= 0);
+                    placedInLogQuery = placedInLogQuery.Where(p => DateTime.Compare(DateTime.Today.AddDays(daysTimeFrame), p.DateViewed) <= 0);
+                    includedInWorkoutQuery = includedInWorkoutQuery.Where(i => DateTime.Compare(DateTime.Today.AddDays(daysTimeFrame), i.DateViewed) <= 0);
+                }
 
                 stats.Views = viewsQuery.Count();
                 stats.ExerciseName = relatedExercise.Name;

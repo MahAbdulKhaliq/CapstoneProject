@@ -6,8 +6,48 @@
 }
 
 <h1 class="text-center">Exercise Statistics</h1>
+<hr />
 
-<table class="table">
+
+<div class="container text-center">
+    <div class="row">
+        <div class="col">
+            <h4>Showing Results for @ViewBag.TimeFrameText</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p>Choose Timeframe:</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form method="get" enctype="multipart/form-data" asp-action="Index">
+                <select id="timeframe" name="timeframe">
+                    <option value="AllTime">All Time</option>
+                    <option value="Today">Today</option>
+                    <option value="ThisWeek">This Week</option>
+                    <option value="ThisMonth">This Month</option>
+                    <option value="ThisYear">This Year</option>
+                </select>
+                <input type="submit" class="btn btn-primary" value="Change Timeframe" />
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (ViewBag.TimeFrameText != "All Time")
+{
+    <div class="text-center">
+        <p><i class="fas fa-info-circle"></i>Views, Number of Comments, Included in Workouts and Placed in Log are all affected by the 'Change Timeframe' function.</p>
+        <p>Comments that are edited will NOT have their edit time considered in the timeframe.</p>
+    </div>
+}
+
+
+
+
+<table class="table mt-2">
     <thead>
         <tr>
             <th>
@@ -43,7 +83,7 @@
             <tr>
                 <td>
                     <a asp-controller="Exercises" asp-action="Details" asp-route-id="@item.ExerciseId">@Html.DisplayFor(modelItem => item.ExerciseName)</a>
-</td>
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Views)
                 </td>
