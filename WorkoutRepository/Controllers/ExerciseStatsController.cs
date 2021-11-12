@@ -24,12 +24,14 @@ namespace WorkoutRepository.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string? timeframe)
         {
+
+            // Sets timeframe to AllTime if GET string is null
             if (timeframe == null)
             {
                 timeframe = "AllTime";
             }
 
-            int daysTimeFrame = 0;
+            int daysTimeFrame = 0; // Int used for comparing timeframe in later LINQ statements if AllTime is not selected
 
             switch (timeframe)
             {
@@ -56,16 +58,17 @@ namespace WorkoutRepository.Controllers
                     break;
             }
 
+            // Queries ExerciseStats - has yet to put relevant data in model
             var statsQuery = from e in _context.ExerciseStats
                              select e;
 
-            var exerciseQuery = from e in _context.Exercise
-                                select e;
-
+            // Executes various counts for comments, views, placed in log, and included in workout operations
             foreach(ExerciseStats stats in statsQuery)
             {
+                // Queries the related exercise by ID to grab its name
                 var relatedExercise = await _context.Exercise.FirstOrDefaultAsync(e => e.Id == stats.ExerciseId);
 
+                // All these other queries are for the relevant counts
                 var commentsQuery = from c in _context.Comment
                                     where c.ExerciseId == stats.ExerciseId
                                     where c.Deleted == false
@@ -86,6 +89,7 @@ namespace WorkoutRepository.Controllers
                                  where v.Discriminator == "IncludedInWorkout"
                                  select v;
 
+                // If the timeframe is not set to 'All Time', also compare the dates to the relevant date selected.
                 if (timeframe != "AllTime")
                 {
                     commentsQuery = commentsQuery.Where(c => DateTime.Compare(DateTime.Today.AddDays(daysTimeFrame), c.Date) <= 0);
@@ -94,6 +98,7 @@ namespace WorkoutRepository.Controllers
                     includedInWorkoutQuery = includedInWorkoutQuery.Where(i => DateTime.Compare(DateTime.Today.AddDays(daysTimeFrame), i.DateViewed) <= 0);
                 }
 
+                // Add various attributes to the model
                 stats.Views = viewsQuery.Count();
                 stats.ExerciseName = relatedExercise.Name;
                 stats.PositiveRatings = relatedExercise.PositiveRatings;
@@ -103,11 +108,12 @@ namespace WorkoutRepository.Controllers
                 stats.IncludedInWorkouts = includedInWorkoutQuery.Count();
             }
 
+            // Convert the statsQuery to a list
             var finalQuery = await statsQuery.ToListAsync();
 
+            // Order said list by views, descending
             finalQuery = finalQuery.OrderByDescending(e => e.Views).ToList();
             
-
             return View(finalQuery);
         }
     }
