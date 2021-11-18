@@ -22,7 +22,7 @@
 
     @if (isAdmin)
     {
-        <p><a asp-area="" asp-controller="Users" asp-action="Index">View users</a></p>
+        <p><a asp-area="Identity" asp-page="/Account/Manage/AdminStats">View admin options</a></p>
 
     }
     else
